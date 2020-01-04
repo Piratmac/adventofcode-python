@@ -47,7 +47,6 @@ for string in puzzle_input.split('\n'):
 
   ingredient, capacity, durability, flavor, texture, calories = re.match('([A-Za-z]*): capacity ([0-9-]*), durability ([0-9-]*), flavor ([0-9-]*), texture ([0-9-]*), calories ([0-9-]*)', string).groups()
   ingredients[ingredient] = (int(capacity), int(durability), int(flavor), int(texture), int(calories))
-print(ingredients)
 
 combinaisons = list(combinations_with_replacement(ingredients, 100))
 recipe_max = 0
