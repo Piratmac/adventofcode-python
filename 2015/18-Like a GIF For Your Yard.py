@@ -25,7 +25,7 @@ test_data[test] = {"input": open(input_file, "r+").read(),
                      "iterations": 100,
                      "expected": ['821', '886'],
                     }
-# 865 too low
+
 # -------------------------------- Control program execution -------------------------------- #
 
 case_to_test  = 'real'
