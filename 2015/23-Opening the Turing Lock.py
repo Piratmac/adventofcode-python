@@ -19,13 +19,13 @@ test_data[test]   = {"input": """""",
 test = 'real'
 input_file = os.path.join(os.path.dirname(__file__), 'Inputs', os.path.basename(__file__).replace('.py', '.txt'))
 test_data[test] = {"input": open(input_file, "r+").read().strip(),
-                     "expected": ['Unknown', 'Unknown'],
+                     "expected": ['170', '247'],
                     }
 
 # -------------------------------- Control program execution -------------------------------- #
 
 case_to_test  = 'real'
-part_to_test  = 2
+part_to_test  = 1
 verbose_level = 1
 
 # -------------------------------- Initialize some variables -------------------------------- #
@@ -48,7 +48,8 @@ while True:
   if i >= len(instructions):
     break
   string = instructions[i]
-  print (i, string, computer)
+  if verbose_level >= 2:
+    print ('Applying instruction', i, ':', string, '- Computer state before : ', computer)
   if string == '':
     continue
   if string[0:3] == 'hlf':
