@@ -146,10 +146,11 @@ class Graph:
         :return: True when the end vertex is found or all is explored or False if not
         """
         current_distance += 1
-        if self.neighbors(vertex) == False:
+        neighbors = self.neighbors(vertex)
+        if not neighbors:
             return
 
-        for neighbor in self.neighbors(vertex):
+        for neighbor in neighbors:
             if neighbor in self.distance_from_start:
                 continue
 
@@ -185,10 +186,11 @@ class Graph:
         while frontier:
             vertex, current_distance = frontier.pop(0)
             current_distance += 1
-            if self.neighbors(vertex) == False:
+            neighbors = self.neighbors(vertex)
+            if not neighbors:
                 continue
 
-            for neighbor in self.neighbors(vertex):
+            for neighbor in neighbors:
                 if neighbor in self.distance_from_start:
                     continue
                 # Adding for future examination
@@ -229,10 +231,11 @@ class Graph:
             _, vertex, current_distance = heapq.heappop(frontier)
 
             current_distance += 1
-            if self.neighbors(vertex) == False:
+            neighbors = self.neighbors(vertex)
+            if not neighbors:
                 continue
 
-            for neighbor in self.neighbors(vertex):
+            for neighbor in neighbors:
                 if neighbor in self.distance_from_start:
                     continue
 
@@ -334,10 +337,11 @@ class WeightedGraph(Graph):
         while frontier:
             current_distance, vertex = heapq.heappop(frontier)
 
-            if self.neighbors(vertex) == False:
+            neighbors = self.neighbors(vertex)
+            if not neighbors:
                 continue
 
-            for neighbor, weight in self.neighbors(vertex).items():
+            for neighbor, weight in neighbors.items():
                 # We've already checked that node, and it's not better now
                 if neighbor in self.distance_from_start \
                         and self.distance_from_start[neighbor] <= (current_distance + weight):
@@ -383,65 +387,11 @@ class WeightedGraph(Graph):
         while frontier:
             _, vertex, current_distance = heapq.heappop(frontier)
 
-            if self.neighbors(vertex) == False:
+            neighbors = self.neighbors(vertex)
+            if not neighbors:
                 continue
 
-            for neighbor, weight in self.neighbors(vertex).items():
-                # We've already checked that node, and it's not better now
-                if neighbor in self.distance_from_start \
-                        and self.distance_from_start[neighbor] <= (current_distance + weight):
-                    continue
-
-                # Adding for future examination
-                priority = current_distance + self.estimate_to_complete(neighbor, end)
-                heapq.heappush(frontier, (priority, neighbor, current_distance + weight))
-
-                # Adding for final search
-                self.distance_from_start[neighbor] = current_distance + weight
-                self.came_from[neighbor] = vertex
-
-                if neighbor == end:
-                    return True
-
-        return end in self.distance_from_start
-
-    def a_star_search_optimized (self, start, end = None):
-        """
-        Performs a A* search
-
-        Only the path length will be stored, to reduce CPU and RAM consumption
-
-        This algorithm is appropriate for "One source, multiple targets"
-        It takes into account positive weigths / costs of travelling.
-        Negative weights will make the algorithm fail.
-
-        The exploration path is a mix of Dijkstra and Greedy BFS
-        It uses the current cost + estimated cost to determine the next element to consider
-
-        Some cases to consider:
-        - If Estimated cost to complete = 0, A* = Dijkstra
-        - If Estimated cost to complete <= actual cost to complete, it is exact
-        - If Estimated cost to complete > actual cost to complete, it is inexact
-        - If Estimated cost to complete = infinity, A* = Greedy BFS
-        The higher Estimated cost to complete, the faster it goes
-
-        :param Any start: The start vertex to consider
-        :param Any end: The target/end vertex to consider
-        :return: True when the end vertex is found, False otherwise
-        """
-        current_distance = 0
-        frontier = [(0, start, 0)]
-        heapq.heapify(frontier)
-        self.distance_from_start = {start: 0}
-        self.came_from = {start: None}
-
-        while frontier:
-            _, vertex, current_distance = heapq.heappop(frontier)
-
-            if self.neighbors(vertex) == False:
-                continue
-
-            for neighbor, weight in self.neighbors(vertex).items():
+            for neighbor, weight in neighbors.items():
                 # We've already checked that node, and it's not better now
                 if neighbor in self.distance_from_start \
                         and self.distance_from_start[neighbor] <= (current_distance + weight):
