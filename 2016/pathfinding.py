@@ -37,6 +37,10 @@ class Graph:
     def estimate_to_complete (self, source_vertex, target_vertex):
         return 0
 
+    def reset_search (self):
+        self.distance_from_start = {}
+        self.came_from = {}
+
     def grid_to_vertices (self, grid, diagonals_allowed = False, wall = '#'):
         """
         Converts a text to a set of coordinates
@@ -164,7 +168,7 @@ class Graph:
             if neighbor == end:
                 raise TargetFound
 
-    def breath_first_search (self, start, end = None):
+    def breadth_first_search (self, start, end = None):
         """
         Performs a breath-first search based on a start node
 

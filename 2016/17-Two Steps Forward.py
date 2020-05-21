@@ -72,7 +72,7 @@ pathfinding.Graph.neighbors = neighbors
 
 vault = pathfinding.Graph([((0, 0), '')])
 
-vault.breath_first_search(((0, 0), ''))
+vault.breadth_first_search(((0, 0), ''))
 
 if part_to_test == 1:
     for vertex in vault.vertices:
