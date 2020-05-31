@@ -164,7 +164,8 @@ else:
       print (' Pruned')
       continue
 
-    print ('Min mana :', min_mana_used, '###### Strategy #', count_strategies,'- pruned: ', len(pruned_strategies), '-', strategy)
+    if verbose_level >=2:
+      print ('Min mana :', min_mana_used, '###### Strategy #', count_strategies,'- pruned: ', len(pruned_strategies), '-', strategy)
     shield_left   = 0
     poison_left   = 0
     recharge_left = 0
