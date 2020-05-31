@@ -64,9 +64,6 @@ for init_a in (158,):
     x = ''
     instructions = puzzle_input.split('\n')
 
-    print ('testing', init_a)
-
-
     while True:
         instruction = instructions[i]
         i += 1
@@ -158,13 +155,12 @@ for init_a in (158,):
         if i >= len(instructions):
             break
         if x != '' and len (x) % 4 == 0:
-            print (x)
             if not (x == '01'*(len(x) // 2) or x == '10'*(len(x) // 2)):
                 break
             if len (x) == 20:
                 puzzle_actual_result = init_a
                 break
-    print (x)
+
     if puzzle_actual_result != 'Unknown':
         break
 

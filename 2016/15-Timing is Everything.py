@@ -43,8 +43,6 @@ for string in puzzle_input.split('\n'):
 if part_to_test == 2:
     disks.append((len(disks)+1, 11, 0))
 
-print (disks)
-
 time = 0
 while True:
     disk_ok = 0

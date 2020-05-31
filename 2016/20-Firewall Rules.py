@@ -51,7 +51,6 @@ blocked.sort()
 max_blocked = blocked[0][1]
 
 for block in blocked:
-    print (block, max_blocked, 'start')
     if max_blocked + 1 >= block[0]:
         max_blocked = max(max_blocked, block[1])
     else:
@@ -60,21 +59,16 @@ for block in blocked:
             break
         else:
             puzzle_actual_result += block[0] - max_blocked - 1
-            print ('Reset', puzzle_actual_result)
             max_blocked = block[1]
             reset_max_blocked = True
-    print (block, max_blocked, 'end')
 
 
-print (reset_max_blocked, max_blocked)
 
 if part_to_test == 2:
     if reset_max_blocked:
         max_blocked = max([block[1] for block in blocked])
     if max_blocked != max_IP:
         puzzle_actual_result += max_IP - max_blocked - 1
-# 544541374 too high
-# 544541246 too high
 
 # -------------------------------- Outputs / results -------------------------------- #
 

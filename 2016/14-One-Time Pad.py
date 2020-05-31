@@ -49,7 +49,6 @@ if part_to_test == 1:
                 new_hash = hashlib.md5((puzzle_input + str(index + i)).encode('utf-8')).hexdigest()
                 if triplet * 5 in new_hash:
                     found_keys += 1
-                    print (init_hash, triplet, index, index + i, found_keys)
                     break
 
         if found_keys == 64:
@@ -81,21 +80,12 @@ else:
         if quintuplets:
             hashes_quintuplets[i] = quintuplets
 
-        if i % 100 == 0:
-            print ('calculated', i)
-
-    print ('Calculated hashes')
-
-
-    print (hashes_first_triplet)
-    print (hashes_quintuplets)
 
     for index, triplet in hashes_first_triplet.items():
         for i in range (1, 1000):
             if index + i in hashes_quintuplets:
                 if triplet in hashes_quintuplets[index + i]:
                     found_keys += 1
-                    print (hashes[index], triplet, index, index + i, found_keys)
                     break
 
         if found_keys == 64:

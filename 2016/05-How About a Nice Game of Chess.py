@@ -43,7 +43,6 @@ if part_to_test == 1:
     encoded = hashlib.md5(coded_value).hexdigest()
     if encoded[0:5] == '00000':
       password += encoded[5]
-      print (i, password, coded_value, encoded)
       if len(password) == 8:
         puzzle_actual_result = password
         break
@@ -61,7 +60,6 @@ else:
         continue
       if password[int(encoded[5])] == '_':
         password[int(encoded[5])] = encoded[6]
-      print (i, ''.join(password), coded_value, encoded)
       if '_' not in password:
         puzzle_actual_result = ''.join(password)
         break

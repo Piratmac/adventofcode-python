@@ -51,7 +51,6 @@ def neighbors (self, vertex):
     directions = ((0, 'U', (0, -1)), (1, 'D', (0, 1)), (2, 'L', (-1, 0)), (3, 'R', (1, 0)))
 
     if coords == (3, 3):
-        print ('found path of length', len(path)+1)
         return []
 
     neighbors = []
@@ -76,7 +75,6 @@ vault.breadth_first_search(((0, 0), ''))
 
 if part_to_test == 1:
     for vertex in vault.vertices:
-        print (vertex)
         if vertex[0] == (3, 3):
             puzzle_actual_result = vertex[1]
             break

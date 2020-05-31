@@ -61,8 +61,6 @@ while True:
     instruction = instructions[i]
     i += 1
 
-#    print (i, instruction, registers)
-
     if instruction[0:3] == 'cpy':
         _, val, target = instruction.split(' ')
         try:

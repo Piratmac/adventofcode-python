@@ -42,8 +42,6 @@ if part_to_test == 1:
     sides.sort()
     a, b, c = sides
 
-    print (string, a, b, c, a+b)
-
     if c < (a + b):
       possible_triangles += 1
 
@@ -57,8 +55,6 @@ else:
   for n in range(len(lines)//3):
     for i in range (3):
       sides = [int(lines[n*3+y][i]) for y in range (3)]
-      print (lines[n*3:n*3+3])
-      print(sides)
       sides.sort()
       a, b, c = sides
 

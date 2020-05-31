@@ -91,7 +91,8 @@ if part_to_test == 1:
       if part_to_test == 2:
         player_stats[1] -= 1
         if player_stats[1] <= 0:
-          print ('Boss wins')
+          if verbose_level >=2:
+            print ('Boss wins')
           break
 
       # Apply effects
@@ -102,14 +103,16 @@ if part_to_test == 1:
 
       # Apply player move
       if spells[player_action][0] > player_stats[0]:
-        print ('Aborting: not enough mana')
+        if verbose_level >=2:
+          print ('Aborting: not enough mana')
         break
       if spells[player_action][1] == 1:
         player_stats[1] += spells[player_action][3]
         boss_stats[0]   -= spells[player_action][2]
       else:
         if counters[player_action] != 0:
-          print ('Aborting: reused ' + player_action)
+          if verbose_level >=2:
+            print ('Aborting: reused ' + player_action)
           break
         else:
           counters[player_action] = spells[player_action][1]
@@ -120,7 +123,8 @@ if part_to_test == 1:
         print (counters, player_stats, boss_stats)
 
       if boss_stats[0] <= 0:
-        print ('Player wins with', mana_used, 'mana used')
+        if verbose_level >=2:
+          print ('Player wins with', mana_used, 'mana used')
         min_mana_used = min (min_mana_used, mana_used)
         break
       if mana_used > min_mana_used:
@@ -140,7 +144,8 @@ if part_to_test == 1:
         print (counters, player_stats, boss_stats)
 
       if player_stats[1] <= 0:
-        print ('Boss wins')
+        if verbose_level >=2:
+          print ('Boss wins')
         break
 else:
   max_moves = 15
@@ -152,7 +157,8 @@ else:
   for strategy in itertools.product(spells.keys(), repeat=max_moves):
     count_strategies -= 1
     if 'S' not in strategy[0:4] or 'R' not in strategy[0:5]:
-      print (' Missing Shield or Recharge')
+      if verbose_level >=2:
+        print (' Missing Shield or Recharge')
       continue
     if any ([True for i in range(1, max_moves) if strategy[0:i] in pruned_strategies]):
       print (' Pruned')
@@ -175,7 +181,8 @@ else:
       # Player turn
       player_hp -= 1
       if player_hp <= 0:
-        print ('Boss wins')
+        if verbose_level >=2:
+          print ('Boss wins')
 #        pruned_strategies.append(tuple(actions_done))
         break
 
@@ -198,7 +205,8 @@ else:
 
       # Apply player move
       if spells[player_action][0] > player_mana:
-        print ('Aborting: not enough mana')
+        if verbose_level >=2:
+          print ('Aborting: not enough mana')
 #        pruned_strategies.append(actions_done)
         break
       # Missile
@@ -215,7 +223,8 @@ else:
       # Shield
       elif player_action == 'S':
         if shield_left != 0:
-          print ('Aborting: reused ' + player_action)
+          if verbose_level >=2:
+            print ('Aborting: reused ' + player_action)
 #          pruned_strategies.append(actions_done)
           break
         else:
@@ -223,7 +232,8 @@ else:
       # Poison
       elif player_action == 'P':
         if poison_left != 0:
-          print ('Aborting: reused ' + player_action)
+          if verbose_level >=2:
+            print ('Aborting: reused ' + player_action)
 #          pruned_strategies.append(actions_done)
           break
         else:
@@ -231,18 +241,21 @@ else:
       # Recharge
       elif player_action == 'R':
         if recharge_left != 0:
-          print ('Aborting: reused ' + player_action)
+          if verbose_level >=2:
+            print ('Aborting: reused ' + player_action)
 #          pruned_strategies.append(actions_done)
           break
         else:
           shield_left = 5
 
       if boss_hp <= 0:
-        print ('Player wins with', mana_used, 'mana used')
+        if verbose_level >=2:
+          print ('Player wins with', mana_used, 'mana used')
         min_mana_used = min (min_mana_used, mana_used)
         break
       if mana_used > min_mana_used:
-        print ('Aborting: too much mana used')
+        if verbose_level >=2:
+          print ('Aborting: too much mana used')
         break
 
 
@@ -263,7 +276,8 @@ else:
       player_hp -= boss_dmg - player_armor
 
       if player_hp <= 0:
-        print ('Boss wins')
+        if verbose_level >=2:
+          print ('Boss wins')
 #        pruned_strategies.append(actions_done)
         break
     else:

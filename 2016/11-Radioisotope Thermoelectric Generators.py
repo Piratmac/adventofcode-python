@@ -110,8 +110,6 @@ if part_to_test == 1:
 
     end = '4' * 11
 
-    print ('number of states', len(states))
-
     graph = pathfinding.WeightedGraph()
     came_from, total_cost = graph.a_star_search(puzzle_input, end)
 

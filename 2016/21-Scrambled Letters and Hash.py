@@ -80,7 +80,6 @@ def scramble_password (puzzle_input):
             else:
                 new_password = password[len(password)-x:] + password[0:len(password)-x]
         password = new_password
-#        print (string, password)
     return password
 
 if part_to_test == 1:
@@ -91,7 +90,6 @@ else:
     for combination in itertools.permutations('abcdefgh'):
         password = ''.join(combination)
         scrambled = scramble_password((password, puzzle_input[1]))
-        print (password, scrambled)
         if scrambled == 'fbgdceah':
             puzzle_actual_result = password
             break

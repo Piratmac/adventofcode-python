@@ -4,7 +4,7 @@ import os
 test_data = {}
 
 test = 1
-test_data[test] = {"input": open('test.txt', "r+").read(),
+test_data[test] = {"input": '',
                      "expected": ['12', '19'],
                     }
 
@@ -35,7 +35,6 @@ if part_to_test == 1:
   len_literals = 0
   len_memory = 0
   for string in puzzle_input.split('\n'):
-    print (string)
     len_literals += len(string)
 
     string = string.replace('\\\\', '\\').replace('\\"', '"')
@@ -44,8 +43,6 @@ if part_to_test == 1:
 
     len_memory += len(string)
 
-    print (string, len_literals, len_memory)
-
   puzzle_actual_result = len_literals - len_memory
 
 
@@ -53,15 +50,12 @@ else:
   len_literals = 0
   len_escaped = 0
   for string in puzzle_input.split('\n'):
-    print (string)
     len_literals += len(string)
 
     string = string.replace('\\', '\\\\').replace('"', '\\"')
     string = '"' + string + '"'
 
     len_escaped += len(string)
-
-    print (string, len_literals, len_escaped)
 
   puzzle_actual_result = len_escaped - len_literals
 

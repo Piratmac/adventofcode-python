@@ -50,7 +50,6 @@ total_weight = sum(list_packages)
 group_weight = total_weight // 3 if part_to_test == 1 else total_weight // 4
 
 for group1_size in range (1, len(list_packages) - 2):
-  print('Testing with group 1 of size', group1_size)
   for group1 in itertools.combinations(list_packages, group1_size):
     if sum(group1) != group_weight:
       continue
@@ -60,7 +59,6 @@ for group1_size in range (1, len(list_packages) - 2):
     remaining_packages = [x for x in list_packages if x not in group1]
 
     for group2_size in range (1, len(remaining_packages) - 2):
-      print('Testing with group 2 of size', group2_size)
       for group2 in itertools.combinations(remaining_packages, group2_size):
         if sum(group2) == group_weight:
           mini_quantum_entanglement = min(mini_quantum_entanglement, reduce(mul, group1, 1))

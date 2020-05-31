@@ -89,7 +89,6 @@ else:
         if (x1, y1) == (x, y):
           continue
         if (x1, y1) in locations_visited and puzzle_actual_result == 'Unknown':
-          print (x1, y1)
           puzzle_actual_result = abs(x1) + abs(y1)
           break
         locations_visited.append((x1, y1))

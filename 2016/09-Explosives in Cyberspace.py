@@ -87,7 +87,6 @@ else:
       continue
 
     def decompress(string):
-      print (string)
       total_length = 0
 
       if '(' in string:
