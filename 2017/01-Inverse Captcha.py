@@ -16,7 +16,7 @@ test_data[test]   = {"input": """""",
 test = 'real'
 input_file = os.path.join(os.path.dirname(__file__), 'Inputs', os.path.basename(__file__).replace('.py', '.txt'))
 test_data[test] = {"input": open(input_file, "r+").read().strip(),
-                     "expected": ['Unknown', 'Unknown'],
+                     "expected": ['1069', '1268'],
                     }
 
 # -------------------------------- Control program execution -------------------------------- #

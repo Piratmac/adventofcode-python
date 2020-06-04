@@ -20,7 +20,7 @@ p=<3,0,0>, v=<-1,0,0>, a=<0,0,0>""",
 test = 'real'
 input_file = os.path.join(os.path.dirname(__file__), 'Inputs', os.path.basename(__file__).replace('.py', '.txt'))
 test_data[test] = {"input": open(input_file, "r+").read().strip(),
-                     "expected": ['Unknown', 'Unknown'],
+                     "expected": ['125', '461'],
                     }
 
 # -------------------------------- Control program execution -------------------------------- #
@@ -91,8 +91,6 @@ else:
             break
         elif i % 10 == 0:
             saved_len = len(particles)
-
-        print(i, len(particles))
 
     puzzle_actual_result = len(particles)
 

@@ -30,7 +30,7 @@ rcv d""",
 test = 'real'
 input_file = os.path.join(os.path.dirname(__file__), 'Inputs', os.path.basename(__file__).replace('.py', '.txt'))
 test_data[test] = {"input": open(input_file, "r+").read().strip(),
-                     "expected": ['7071', 'Unknown'],
+                     "expected": ['7071', '8001'],
                     }
 
 # -------------------------------- Control program execution -------------------------------- #

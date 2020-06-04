@@ -20,7 +20,7 @@ test_data[test]   = {"input": """5 9 2 8
 test = 'real'
 input_file = os.path.join(os.path.dirname(__file__), 'Inputs', os.path.basename(__file__).replace('.py', '.txt'))
 test_data[test] = {"input": open(input_file, "r+").read().strip(),
-                     "expected": ['Unknown', 'Unknown'],
+                     "expected": ['46402', '265'],
                     }
 
 # -------------------------------- Control program execution -------------------------------- #

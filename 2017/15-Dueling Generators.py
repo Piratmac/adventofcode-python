@@ -12,7 +12,7 @@ Generator B starts with 8921""",
 test = 'real'
 input_file = os.path.join(os.path.dirname(__file__), 'Inputs', os.path.basename(__file__).replace('.py', '.txt'))
 test_data[test] = {"input": open(input_file, "r+").read().strip(),
-                     "expected": ['597', 'Unknown'],
+                     "expected": ['597', '303'],
                     }
 
 # -------------------------------- Control program execution -------------------------------- #

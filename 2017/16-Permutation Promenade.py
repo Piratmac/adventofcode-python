@@ -11,7 +11,7 @@ test_data[test]   = {"input": ('abcde', """s1,x3/4,pe/b"""),
 test = 'real'
 input_file = os.path.join(os.path.dirname(__file__), 'Inputs', os.path.basename(__file__).replace('.py', '.txt'))
 test_data[test] = {"input": ('abcdefghijklmnop', open(input_file, "r+").read().strip()),
-                     "expected": ['ceijbfoamgkdnlph', 'Unknown'],
+                     "expected": ['ceijbfoamgkdnlph', 'pnhajoekigcbflmd'],
                     }
 
 # -------------------------------- Control program execution -------------------------------- #
