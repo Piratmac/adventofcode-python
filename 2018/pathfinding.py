@@ -51,6 +51,7 @@ class Graph:
 
         :param string grid: The grid to convert
         :param Boolean diagonals_allowed: Whether diagonal movement is allowed
+        :param str wall: What is considered as a wall
         :return: True if the grid was converted
         """
         self.vertices = []
@@ -76,6 +77,28 @@ class Graph:
                         self.edges[(coords)] = [(x, y)]
 
         return True
+
+    def grid_search (self, grid, items):
+        """
+        Searches the grid for some items
+
+        :param string grid: The grid to convert
+        :param Boolean items: Whether diagonal movement is allowed
+        :return: True if the grid was converted
+        """
+        items_found = {}
+        y = 0
+
+        for line in grid.splitlines():
+            for x in range(len(line)):
+                if line[x] in items:
+                    if line[x] in items_found:
+                        items_found[line[x]].append((x, y))
+                    else:
+                        items_found[line[x]] = [(x, y)]
+            y += 1
+
+        return items_found
 
     def vertices_to_grid (self, mark_coords = [], wall = '#'):
         """
@@ -221,9 +244,7 @@ class Graph:
             not_visited.remove(next_node)
             current_distance += 1
             edges = {x:edges[x] for x in edges if x in not_visited}
-            print (not_visited, edges)
             next_node = sorted(x for x in not_visited if not x in sum(edges.values(), []))
-            print (len(next_node), next_node)
             if len(next_node):
                 next_node = next_node[0]
 
