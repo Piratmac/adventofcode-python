@@ -1,12 +1,50 @@
 import heapq
 
+# Cardinal directions
+north = 1j
+south = -1j
+west = -1
+east = 1
+northeast = 1 + 1j
+northwest = -1 + 1j
+southeast = 1 - 1j
+southwest = -1 - 1j
+
+directions_straight = [north, south, west, east]
+directions_diagonals = directions_straight + [
+    northeast,
+    northwest,
+    southeast,
+    southwest,
+]
+
+
+def min_real(complexes):
+    real_values = [x.real for x in complexes]
+    return min(real_values)
+
+
+def min_imag(complexes):
+    real_values = [x.imag for x in complexes]
+    return min(real_values)
+
+
+def max_real(complexes):
+    real_values = [x.real for x in complexes]
+    return max(real_values)
+
+
+def max_imag(complexes):
+    real_values = [x.imag for x in complexes]
+    return max(real_values)
+
 
 class TargetFound(Exception):
     pass
 
+
 class NegativeWeightCycle(Exception):
     pass
-
 
 
 class Graph:
@@ -15,7 +53,7 @@ class Graph:
     distance_from_start = {}
     came_from = {}
 
-    def __init__ (self, vertices = [], edges = {}):
+    def __init__(self, vertices=[], edges={}):
         self.vertices = vertices
         self.edges = edges
 
@@ -31,22 +69,22 @@ class Graph:
         else:
             return False
 
-    def is_valid (self, vertex):
+    def is_valid(self, vertex):
         return vertex in self.vertices
 
-    def estimate_to_complete (self, source_vertex, target_vertex):
+    def estimate_to_complete(self, source_vertex, target_vertex):
         return 0
 
-    def reset_search (self):
+    def reset_search(self):
         self.distance_from_start = {}
         self.came_from = {}
 
-    def grid_to_vertices (self, grid, diagonals_allowed = False, wall = '#'):
+    def grid_to_vertices(self, grid, diagonals_allowed=False, wall="#"):
         """
         Converts a text to a set of coordinates
 
         The text is expected to be separated by newline characters
-        The vertices will have (x, y) as coordinates
+        The vertices will have x - y * 1j as coordinates
         Edges will be calculated as well
 
         :param string grid: The grid to convert
@@ -60,25 +98,26 @@ class Graph:
         for line in grid.splitlines():
             for x in range(len(line)):
                 if line[x] != wall:
-                    self.vertices.append((x, y))
+                    self.vertices.append(x - y * 1j)
             y += 1
 
-        directions = [(1, 0), (-1, 0), (0, 1), (0, -1)]
         if diagonals_allowed:
-            directions += [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+            directions = directions_diagonals
+        else:
+            directions = directions_straight
 
-        for coords in self.vertices:
+        for source in self.vertices:
             for direction in directions:
-                x, y = coords[0] + direction[0], coords[1] + direction[1]
-                if (x, y) in self.vertices:
-                    if coords in self.edges:
-                        self.edges[(coords)].append((x, y))
+                target = source + direction
+                if target in self.vertices:
+                    if source in self.edges:
+                        self.edges[(source)].append(target)
                     else:
-                        self.edges[(coords)] = [(x, y)]
+                        self.edges[(source)] = [target]
 
         return True
 
-    def grid_search (self, grid, items):
+    def grid_search(self, grid, items):
         """
         Searches the grid for some items
 
@@ -93,14 +132,14 @@ class Graph:
             for x in range(len(line)):
                 if line[x] in items:
                     if line[x] in items_found:
-                        items_found[line[x]].append((x, y))
+                        items_found[line[x]].append(x - y * 1j)
                     else:
-                        items_found[line[x]] = [(x, y)]
+                        items_found[line[x]] = [x - y * 1j]
             y += 1
 
         return items_found
 
-    def vertices_to_grid (self, mark_coords = [], wall = '#'):
+    def vertices_to_grid(self, mark_coords=[], wall="#"):
         """
         Converts a set of coordinates to a text
 
@@ -110,32 +149,42 @@ class Graph:
         :param string wall: Which character to use as walls
         :return: True if the grid was converted
         """
-        x, y = (0, 0)
-        grid = ''
+        grid = ""
 
-        all_x = [i[0] for i in self.vertices]
-        all_y = [i[1] for i in self.vertices]
-        min_x, max_x = min(all_x), max(all_x)
-        min_y, max_y = min(all_y), max(all_y)
+        min_y, max_y = int(max_imag(self.vertices)), int(min_imag(self.vertices))
+        min_x, max_x = int(min_real(self.vertices)), int(max_real(self.vertices))
 
         if isinstance(next(iter(self.vertices)), dict):
             vertices = self.vertices.keys()
         else:
             vertices = self.vertices
 
-        for y in range(min_y, max_y+1):
-            for x in range(min_x, max_x+1):
-                if (x, y) in mark_coords:
-                    grid += 'X'
-                elif (x, y) in vertices:
-                    grid += '.'
+        for y in range(min_y, max_y - 1, -1):
+            for x in range(min_x, max_x + 1):
+                if x + y * 1j in mark_coords:
+                    grid += "X"
+                elif x + y * 1j in vertices:
+                    grid += "."
                 else:
                     grid += wall
-            grid += '\n'
+            grid += "\n"
 
         return grid
 
-    def depth_first_search (self, start, end = None):
+    def add_traps(self, vertex):
+        """
+        Creates traps: places that can be reached, but not exited
+
+        :param Any vertex: The vertex to consider
+        :return: True if successful, False if no vertex found
+        """
+        if vertex in self.edges:
+            del self.edges[vertex]
+            return True
+        else:
+            return False
+
+    def depth_first_search(self, start, end=None):
         """
         Performs a depth-first search based on a start node
 
@@ -159,7 +208,7 @@ class Graph:
             return False
         return False
 
-    def depth_first_search_recursion (self, current_distance, vertex, end = None):
+    def depth_first_search_recursion(self, current_distance, vertex, end=None):
         """
         Recurrence function for depth-first search
 
@@ -190,7 +239,7 @@ class Graph:
             if neighbor == end:
                 raise TargetFound
 
-    def topological_sort (self):
+    def topological_sort(self):
         """
         Performs a topological sort
 
@@ -214,12 +263,14 @@ class Graph:
 
             not_visited -= set(next_nodes)
             current_distance += 1
-            edges = {x:edges[x] for x in edges if x in not_visited}
-            next_nodes = sorted(x for x in not_visited if not x in sum(edges.values(), []))
+            edges = {x: edges[x] for x in edges if x in not_visited}
+            next_nodes = sorted(
+                x for x in not_visited if not x in sum(edges.values(), [])
+            )
 
         return True
 
-    def topological_sort_alphabetical (self):
+    def topological_sort_alphabetical(self):
         """
         Performs a topological sort with alphabetical sort
 
@@ -235,7 +286,9 @@ class Graph:
         not_visited = set(self.vertices)
         edges = self.edges.copy()
 
-        next_node = sorted(x for x in not_visited if x not in sum(edges.values(), []))[0]
+        next_node = sorted(x for x in not_visited if x not in sum(edges.values(), []))[
+            0
+        ]
         current_distance = 0
 
         while not_visited:
@@ -243,14 +296,16 @@ class Graph:
 
             not_visited.remove(next_node)
             current_distance += 1
-            edges = {x:edges[x] for x in edges if x in not_visited}
-            next_node = sorted(x for x in not_visited if not x in sum(edges.values(), []))
+            edges = {x: edges[x] for x in edges if x in not_visited}
+            next_node = sorted(
+                x for x in not_visited if not x in sum(edges.values(), [])
+            )
             if len(next_node):
                 next_node = next_node[0]
 
         return True
 
-    def breadth_first_search (self, start, end = None):
+    def breadth_first_search(self, start, end=None):
         """
         Performs a breath-first search based on a start node
 
@@ -293,7 +348,7 @@ class Graph:
             return True
         return False
 
-    def greedy_best_first_search (self, start, end):
+    def greedy_best_first_search(self, start, end):
         """
         Performs a greedy best-first search based on a start node
 
@@ -326,7 +381,14 @@ class Graph:
                     continue
 
                 # Adding for future examination
-                heapq.heappush(frontier, (self.estimate_to_complete(neighbor, end), neighbor, current_distance))
+                heapq.heappush(
+                    frontier,
+                    (
+                        self.estimate_to_complete(neighbor, end),
+                        neighbor,
+                        current_distance,
+                    ),
+                )
 
                 # Adding for final search
                 self.distance_from_start[neighbor] = current_distance
@@ -337,7 +399,7 @@ class Graph:
 
         return False
 
-    def path (self, target_vertex):
+    def path(self, target_vertex):
         """
         Reconstructs the path followed to reach a given vertex
 
@@ -355,12 +417,14 @@ class Graph:
 
 
 class WeightedGraph(Graph):
-    def grid_to_vertices (self, grid, diagonals_allowed = False, wall = '#', cost_straight = 1, cost_diagonal = 2):
+    def grid_to_vertices(
+        self, grid, diagonals_allowed=False, wall="#", cost_straight=1, cost_diagonal=2
+    ):
         """
         Converts a text to a set of coordinates
 
         The text is expected to be separated by newline characters
-        The vertices will have (x, y) as coordinates
+        The vertices will have x - y * 1j as coordinates
         Edges will be calculated as well
 
         :param string grid: The grid to convert
@@ -375,30 +439,31 @@ class WeightedGraph(Graph):
         for line in grid.splitlines():
             for x in range(len(line)):
                 if line[x] != wall:
-                    self.vertices.append((x, y))
+                    self.vertices.append(x - y * 1j)
             y += 1
 
-        directions_straight = [(1, 0), (-1, 0), (0, 1), (0, -1)]
-        directions_diagonal = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
-
-        directions = directions_straight[:]
         if diagonals_allowed:
-            directions += directions_diagonal
+            directions = directions_diagonals
+        else:
+            directions = directions_straight
 
-        for coords in self.vertices:
+        for source in self.vertices:
             for direction in directions:
-                cost = cost_straight if direction in directions_straight \
-                                     else cost_diagonal
-                x, y = coords[0] + direction[0], coords[1] + direction[1]
-                if (x, y) in self.vertices:
-                    if coords in self.edges:
-                        self.edges[(coords)][(x, y)] = cost
+                cost = (
+                    cost_straight if direction in directions_straight else cost_diagonal
+                )
+                target = source + direction
+                if target in self.vertices:
+                    if source in self.edges:
+                        self.edges[(source)][target] = cost
                     else:
-                        self.edges[(coords)] = {(x, y): cost}
+                        self.edges[(source)] = {target: cost}
 
         return True
 
-    def dijkstra (self, start, end = None):
+        return True
+
+    def dijkstra(self, start, end=None):
         """
         Applies the Dijkstra algorithm to a given search
 
@@ -429,8 +494,9 @@ class WeightedGraph(Graph):
 
             for neighbor, weight in neighbors.items():
                 # We've already checked that node, and it's not better now
-                if neighbor in self.distance_from_start \
-                        and self.distance_from_start[neighbor] <= (current_distance + weight):
+                if neighbor in self.distance_from_start and self.distance_from_start[
+                    neighbor
+                ] <= (current_distance + weight):
                     continue
 
                 # Adding for future examination
@@ -442,7 +508,7 @@ class WeightedGraph(Graph):
 
         return end is None or end in self.distance_from_start
 
-    def a_star_search (self, start, end = None):
+    def a_star_search(self, start, end=None):
         """
         Performs a A* search
 
@@ -479,13 +545,16 @@ class WeightedGraph(Graph):
 
             for neighbor, weight in neighbors.items():
                 # We've already checked that node, and it's not better now
-                if neighbor in self.distance_from_start \
-                        and self.distance_from_start[neighbor] <= (current_distance + weight):
+                if neighbor in self.distance_from_start and self.distance_from_start[
+                    neighbor
+                ] <= (current_distance + weight):
                     continue
 
                 # Adding for future examination
                 priority = current_distance + self.estimate_to_complete(neighbor, end)
-                heapq.heappush(frontier, (priority, neighbor, current_distance + weight))
+                heapq.heappush(
+                    frontier, (priority, neighbor, current_distance + weight)
+                )
 
                 # Adding for final search
                 self.distance_from_start[neighbor] = current_distance + weight
@@ -496,7 +565,7 @@ class WeightedGraph(Graph):
 
         return end in self.distance_from_start
 
-    def bellman_ford (self, start, end = None):
+    def bellman_ford(self, start, end=None):
         """
         Applies the Bellman–Ford algorithm to a given search
 
@@ -515,13 +584,16 @@ class WeightedGraph(Graph):
         self.distance_from_start = {start: 0}
         self.came_from = {start: None}
 
-        for i in range (len(self.vertices)-1):
+        for i in range(len(self.vertices) - 1):
             for vertex in self.vertices:
                 current_distance = self.distance_from_start[vertex]
                 for neighbor, weight in self.neighbors(vertex).items():
                     # We've already checked that node, and it's not better now
-                    if neighbor in self.distance_from_start \
-                            and self.distance_from_start[neighbor] <= (current_distance + weight):
+                    if neighbor in self.distance_from_start and self.distance_from_start[
+                        neighbor
+                    ] <= (
+                        current_distance + weight
+                    ):
                         continue
 
                     # Adding for final search
@@ -531,9 +603,9 @@ class WeightedGraph(Graph):
         # Check for cycles
         for vertex in self.vertices:
             for neighbor, weight in self.neighbors(vertex).items():
-                if neighbor in self.distance_from_start \
-                        and self.distance_from_start[neighbor] <= (current_distance + weight):
+                if neighbor in self.distance_from_start and self.distance_from_start[
+                    neighbor
+                ] <= (current_distance + weight):
                     raise NegativeWeightCycle
 
         return end is None or end in self.distance_from_start
-
