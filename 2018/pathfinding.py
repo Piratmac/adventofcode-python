@@ -1,42 +1,6 @@
 import heapq
 
-# Cardinal directions
-north = 1j
-south = -1j
-west = -1
-east = 1
-northeast = 1 + 1j
-northwest = -1 + 1j
-southeast = 1 - 1j
-southwest = -1 - 1j
-
-directions_straight = [north, south, west, east]
-directions_diagonals = directions_straight + [
-    northeast,
-    northwest,
-    southeast,
-    southwest,
-]
-
-
-def min_real(complexes):
-    real_values = [x.real for x in complexes]
-    return min(real_values)
-
-
-def min_imag(complexes):
-    real_values = [x.imag for x in complexes]
-    return min(real_values)
-
-
-def max_real(complexes):
-    real_values = [x.real for x in complexes]
-    return max(real_values)
-
-
-def max_imag(complexes):
-    real_values = [x.imag for x in complexes]
-    return max(real_values)
+from complex_utils import *
 
 
 class TargetFound(Exception):
@@ -121,21 +85,20 @@ class Graph:
         """
         Searches the grid for some items
 
-        :param string grid: The grid to convert
-        :param Boolean items: Whether diagonal movement is allowed
+        :param string grid: The grid in which to search
+        :param Boolean items: The items to search
         :return: True if the grid was converted
         """
         items_found = {}
         y = 0
 
-        for line in grid.splitlines():
+        for y, line in enumerate(grid.splitlines()):
             for x in range(len(line)):
                 if line[x] in items:
                     if line[x] in items_found:
                         items_found[line[x]].append(x - y * 1j)
                     else:
                         items_found[line[x]] = [x - y * 1j]
-            y += 1
 
         return items_found
 
@@ -171,18 +134,41 @@ class Graph:
 
         return grid
 
-    def add_traps(self, vertex):
+    def add_traps(self, vertices):
         """
         Creates traps: places that can be reached, but not exited
 
-        :param Any vertex: The vertex to consider
+        :param Any vertex: The vertices to consider
         :return: True if successful, False if no vertex found
         """
-        if vertex in self.edges:
-            del self.edges[vertex]
-            return True
-        else:
-            return False
+        changed = False
+        for vertex in vertices:
+            if vertex in self.edges:
+                del self.edges[vertex]
+                changed = True
+
+        return changed
+
+    def add_walls(self, vertices):
+        """
+        Adds walls - useful for modification of map
+
+        :param Any vertex: The vertices to consider
+        :return: True if successful, False if no vertex found
+        """
+        changed = False
+        for vertex in vertices:
+            if vertex in self.edges:
+                del self.edges[vertex]
+                del self.vertices[vertex]
+                changed = True
+
+        self.edges = {
+            source: [target for target in self.edges[source] if target not in vertices]
+            for source in self.edges
+        }
+
+        return changed
 
     def depth_first_search(self, start, end=None):
         """
