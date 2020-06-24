@@ -1,7 +1,7 @@
 """
 Small library for complex numbers
 """
-
+from math import sqrt
 
 # Cardinal directions
 north = 1j
@@ -61,6 +61,9 @@ def complex_sort(complexes, mode=""):
     # Sorts by imaginary, then by real component (y then x)
     elif mode == "yx":
         complexes.sort(key=lambda a: (a.imag, a.real))
+    # Sorts by negative imaginary, then by real component (-y then x) - 'Reading" order
+    elif mode == "reading":
+        complexes.sort(key=lambda a: (-a.imag, a.real))
     # Sorts by distance from 0,0 (kind of polar coordinates)
     else:
         complexes.sort(key=lambda a: sqrt(a.imag ** 2 + a.real ** 2))
