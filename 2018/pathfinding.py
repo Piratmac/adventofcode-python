@@ -87,7 +87,7 @@ class Graph:
 
         :param string grid: The grid in which to search
         :param Boolean items: The items to search
-        :return: True if the grid was converted
+        :return: A dictionnary of the items found
         """
         items_found = {}
         y = 0
@@ -102,13 +102,13 @@ class Graph:
 
         return items_found
 
-    def vertices_to_grid(self, mark_coords=[], wall="#"):
+    def vertices_to_grid(self, mark_coords={}, wall="#"):
         """
         Converts a set of coordinates to a text
 
         The text will be separated by newline characters
 
-        :param list mark_coords: List of coordonates to mark
+        :param dict mark_coords: List of coordinates to mark, with letter to use
         :param string wall: Which character to use as walls
         :return: True if the grid was converted
         """
@@ -117,19 +117,21 @@ class Graph:
         min_y, max_y = int(max_imag(self.vertices)), int(min_imag(self.vertices))
         min_x, max_x = int(min_real(self.vertices)), int(max_real(self.vertices))
 
-        if isinstance(next(iter(self.vertices)), dict):
-            vertices = self.vertices.keys()
-        else:
-            vertices = self.vertices
-
         for y in range(min_y, max_y - 1, -1):
             for x in range(min_x, max_x + 1):
-                if x + y * 1j in mark_coords:
-                    grid += "X"
-                elif x + y * 1j in vertices:
-                    grid += "."
-                else:
-                    grid += wall
+                try:
+                    grid += mark_coords[x + y * 1j]
+                except KeyError:
+                    if x + y * 1j in mark_coords:
+                        grid += "X"
+                    else:
+                        try:
+                            grid += self.vertices.get(x + y * 1j, wall)
+                        except AttributeError:
+                            if x + y * 1j in self.vertices:
+                                grid += "."
+                            else:
+                                grid += wall
             grid += "\n"
 
         return grid
@@ -160,7 +162,7 @@ class Graph:
         for vertex in vertices:
             if vertex in self.edges:
                 del self.edges[vertex]
-                del self.vertices[vertex]
+                self.vertices.remove(vertex)
                 changed = True
 
         self.edges = {
