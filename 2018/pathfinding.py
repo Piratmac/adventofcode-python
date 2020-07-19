@@ -449,8 +449,6 @@ class WeightedGraph(Graph):
 
         return True
 
-        return True
-
     def dijkstra(self, start, end=None):
         """
         Applies the Dijkstra algorithm to a given search
