@@ -172,6 +172,25 @@ class Graph:
 
         return changed
 
+    def dfs_groups(self):
+        """
+        Groups vertices based on depth-first search
+
+        :return: A list of groups
+        """
+        groups = []
+        unvisited = self.vertices.copy()
+
+        while unvisited:
+            start = unvisited.pop()
+            self.depth_first_search(start)
+
+            newly_visited = list(self.distance_from_start.keys())
+            unvisited = [x for x in unvisited if x not in newly_visited]
+            groups.append(newly_visited)
+
+        return groups
+
     def depth_first_search(self, start, end=None):
         """
         Performs a depth-first search based on a start node
