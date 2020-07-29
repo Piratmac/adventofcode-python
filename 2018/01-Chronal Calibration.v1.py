@@ -40,17 +40,17 @@ if part_to_test == 1:
 
 
 else:
-    data = list(map(int, puzzle_input.splitlines()))
-    used_frequencies = [sum(data[0 : i + 1]) for i in range(len(data))]
-    delta = sum(map(int, puzzle_input.splitlines()))
+    used_frequencies = [0]
     frequency = 0
-    i = 0
     while True:
-        i += 1
-        new_freq = [x + i * delta for x in used_frequencies]
-        reuse = [freq for freq in new_freq if freq in used_frequencies]
-        if reuse:
-            puzzle_actual_result = reuse[0]
+        for string in puzzle_input.split("\n"):
+            frequency += int(string)
+            if frequency in used_frequencies:
+                puzzle_actual_result = frequency
+                break
+            used_frequencies.append(frequency)
+
+        if puzzle_actual_result != "Unknown":
             break
 
 
