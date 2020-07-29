@@ -3,15 +3,66 @@ Small library for complex numbers
 """
 from math import sqrt
 
+
+class ReturnTypeWrapper(type):
+    def __new__(mcs, name, bases, dct):
+        cls = type.__new__(mcs, name, bases, dct)
+        for attr, obj in cls.wrapped_base.__dict__.items():
+            # skip 'member descriptor's and overridden methods
+            if type(obj) == type(complex.real) or attr in dct:
+                continue
+            if getattr(obj, "__objclass__", None) is cls.wrapped_base:
+                setattr(cls, attr, cls.return_wrapper(obj))
+        return cls
+
+    def return_wrapper(cls, obj):
+        def convert(value):
+            return cls(value) if type(value) is cls.wrapped_base else value
+
+        def wrapper(*args, **kwargs):
+            return convert(obj(*args, **kwargs))
+
+        wrapper.__name__ = obj.__name__
+        return wrapper
+
+
+class SuperComplex(complex):
+    __metaclass__ = ReturnTypeWrapper
+    wrapped_base = complex
+
+    def __lt__(self, other):
+        return abs(other - self) < 0
+
+    def __le__(self, other):
+        return abs(other - self) <= 0
+
+    def __gt__(self, other):
+        return abs(other - self) > 0
+
+    def __ge__(self, other):
+        return abs(other - self) >= 0
+
+    def __str__(self):
+        return "(" + str(self.real) + "," + str(self.imag) + ")"
+
+    def __add__(self, no):
+        return SuperComplex(self.real + no.real, self.imag + no.imag)
+
+    def __sub__(self, no):
+        return SuperComplex(self.real - no.real, self.imag - no.imag)
+
+
+j = SuperComplex(1j)
+
 # Cardinal directions
-north = 1j
-south = -1j
+north = j
+south = -j
 west = -1
 east = 1
-northeast = 1 + 1j
-northwest = -1 + 1j
-southeast = 1 - 1j
-southwest = -1 - 1j
+northeast = 1 + j
+northwest = -1 + j
+southeast = 1 - j
+southwest = -1 - j
 
 directions_straight = [north, south, west, east]
 directions_diagonals = directions_straight + [
@@ -23,8 +74,8 @@ directions_diagonals = directions_straight + [
 
 # To be multiplied by the current cartinal direction
 relative_directions = {
-    "left": 1j,
-    "right": -1j,
+    "left": j,
+    "right": -j,
     "ahead": 1,
     "back": -1,
 }

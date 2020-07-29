@@ -1,6 +1,12 @@
 # -------------------------------- Input data ---------------------------------------- #
 import os, pathfinding
 
+from complex_utils import *
+
+
+j = SuperComplex(1j)
+
+
 test_data = {}
 
 test = 1
@@ -18,7 +24,7 @@ input_file = os.path.join(
 )
 test_data[test] = {
     "input": open(input_file, "r+").read().strip(),
-    "expected": ["6256", "Unknown"],
+    "expected": ["6256", "973"],
 }
 
 # -------------------------------- Control program execution ------------------------- #
@@ -40,7 +46,7 @@ _, target = puzzle_input.splitlines()[1].split(" ")
 
 depth = int(depth)
 max_x, max_y = map(int, target.split(","))
-target = max_x - 1j * max_y
+target = max_x - j * max_y
 
 geological = {0: 0}
 erosion = {0: 0}
@@ -48,15 +54,15 @@ for x in range(max_x + 1):
     geological[x] = x * 16807
     erosion[x] = (geological[x] + depth) % 20183
 for y in range(max_y + 1):
-    geological[-1j * y] = y * 48271
-    erosion[-1j * y] = (geological[-1j * y] + depth) % 20183
+    geological[-j * y] = y * 48271
+    erosion[-j * y] = (geological[-j * y] + depth) % 20183
 
 for x in range(1, max_x + 1):
     for y in range(1, max_y + 1):
-        geological[x - 1j * y] = (
-            erosion[x - 1 - 1j * y] * erosion[x - 1j * (y - 1)]
+        geological[x - j * y] = (
+            erosion[x - 1 - j * y] * erosion[x - j * (y - 1)]
         ) % 20183
-        erosion[x - 1j * y] = (geological[x - 1j * y] + depth) % 20183
+        erosion[x - j * y] = (geological[x - j * y] + depth) % 20183
 
 geological[target] = 0
 erosion[target] = 0
@@ -70,25 +76,11 @@ else:
     neither, climbing, torch = 0, 1, 2
     rocky, wet, narrow = 0, 1, 2
 
-    # Override the neighbors function
-    def neighbors(self, vertex):
-        north = (0, 1)
-        south = (0, -1)
-        west = (-1, 0)
-        east = (1, 0)
-        directions_straight = [north, south, west, east]
-
-        neighbors = {}
-        for dir in directions_straight:
-            target = (vertex[0] + dir[0], vertex[1] + dir[1], vertex[2])
-            if target in self.vertices:
-                neighbors[target] = 1
-        for tool in (neither, climbing, torch):
-            target = (vertex[0], vertex[1], tool)
-            if target in self.vertices and tool != vertex[1]:
-                neighbors[target] = 7
-
-        return neighbors
+    allowed = {
+        rocky: [torch, climbing],
+        wet: [neither, climbing],
+        narrow: [torch, neither],
+    }
 
     # Add some coordinates around the target
     padding = 10 if case_to_test == 1 else 50
@@ -96,39 +88,74 @@ else:
         geological[x] = x * 16807
         erosion[x] = (geological[x] + depth) % 20183
     for y in range(max_y, max_y + padding):
-        geological[-1j * y] = y * 48271
-        erosion[-1j * y] = (geological[-1j * y] + depth) % 20183
+        geological[-j * y] = y * 48271
+        erosion[-j * y] = (geological[-j * y] + depth) % 20183
     for x in range(1, max_x + padding):
         for y in range(1, max_y + padding):
-            if x - 1j * y in geological:
+            if x - j * y in geological:
                 continue
-            geological[x - 1j * y] = (
-                erosion[x - 1 - 1j * y] * erosion[x - 1j * (y - 1)]
+            geological[x - j * y] = (
+                erosion[x - 1 - j * y] * erosion[x - j * (y - 1)]
             ) % 20183
-            erosion[x - 1j * y] = (geological[x - 1j * y] + depth) % 20183
+            erosion[x - j * y] = (geological[x - j * y] + depth) % 20183
 
     terrain = {x: erosion[x] % 3 for x in erosion}
+
     del erosion
     del geological
 
-    # Then run pathfinding algo
+    # Prepare pathfinding algorithm
+
+    # Override the neighbors function
+    def neighbors(self, vertex):
+        north = j
+        south = -j
+        west = -1
+        east = 1
+        directions_straight = [north, south, west, east]
+
+        neighbors = {}
+        for dir in directions_straight:
+            target = (vertex[0] + dir, vertex[1])
+            if self.is_valid(target):
+                neighbors[target] = 1
+        for tool in (neither, climbing, torch):
+            target = (vertex[0], tool)
+            if self.is_valid(target):
+                neighbors[target] = 7
+
+        return neighbors
+
+    # Define what is a valid spot
+    def is_valid(self, vertex):
+        if vertex[0].real < 0 or vertex[0].imag > 0:
+            return False
+        if vertex[0].real >= max_x + padding or vertex[0].imag <= -(max_y + padding):
+            return False
+        if vertex[1] in allowed[terrain[vertex[0]]]:
+            return True
+        return False
+
+    # Heuristics function for A* search
+    def estimate_to_complete(self, start, target):
+        distance = 0
+        for i in range(len(start) - 1):
+            distance += abs(start[i] - target[i])
+        distance += 7 if start[-1] != target[-1] else 0
+        return distance
+
+    # Run pathfinding algorithm
     pathfinding.WeightedGraph.neighbors = neighbors
-    vertices = [
-        (x.real, x.imag, neither) for x in terrain if terrain[x] in (wet, narrow)
-    ]
-    vertices += [
-        (x.real, x.imag, climbing) for x in terrain if terrain[x] in (rocky, wet)
-    ]
-    vertices += [
-        (x.real, x.imag, torch) for x in terrain if terrain[x] in (rocky, narrow)
-    ]
-    graph = pathfinding.WeightedGraph(vertices)
+    pathfinding.WeightedGraph.is_valid = is_valid
+    pathfinding.Graph.estimate_to_complete = estimate_to_complete
 
-    graph.dijkstra((0, 0, torch), (max_x, -max_y, torch))
+    graph = pathfinding.WeightedGraph()
 
-    puzzle_actual_result = graph.distance_from_start[(max_x, -max_y, torch)]
+    graph.a_star_search(
+        (SuperComplex(0), torch), (SuperComplex(max_x - j * max_y), torch)
+    )
 
-# 979 is too high
+    puzzle_actual_result = graph.distance_from_start[(max_x - j * max_y, torch)]
 
 
 # -------------------------------- Outputs / results --------------------------------- #

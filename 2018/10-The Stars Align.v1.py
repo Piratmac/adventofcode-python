@@ -71,31 +71,25 @@ for string in puzzle_input.split("\n"):
     stars.append(list(map(int, r)))
 
 star_map = pathfinding.Graph()
-stars_init = [star.copy() for star in stars]
-min_galaxy_size = 10 ** 15
-min_i_galaxy_size = 0
 for i in range(2 * 10 ** 4):
-    stars = [(x + i * vx, y + i * vy, vx, i * vy) for x, y, vx, vy in stars_init]
+    stars = [(x + vx, y + vy, vx, vy) for x, y, vx, vy in stars]
+    vertices = [x - y * 1j for x, y, vx, vy in stars]
 
-    # This gives a very rough idea of the galaxy's size
-    coords = list(zip(*stars))
-    galaxy_size = max(coords[0]) - min(coords[0]) + max(coords[1]) - max(coords[1])
+    # This was solved a bit manually
+    # I noticed all coordinates would converge around 0 at some point
+    # That point was around 10300 seconds
+    # Then made a limit: all coordinates should be within 300 from zero
+    # (my first test was actually 200, but that was gave no result)
+    # This gave ~ 20 seconds of interesting time
+    # At the end it was trial and error to find 10 240
+    coords = [v.real in range(-300, 300) for v in vertices] + [
+        v.imag in range(-300, 300) for v in vertices
+    ]
 
-    if i == 0:
-        min_galaxy_size = galaxy_size
-
-    if galaxy_size < min_galaxy_size:
-        min_i_galaxy_size = i
-        min_galaxy_size = galaxy_size
-    elif galaxy_size > min_galaxy_size:
-        vertices = [
-            x + vx * min_i_galaxy_size - (y + vy * min_i_galaxy_size) * 1j
-            for x, y, vx, vy in stars_init
-        ]
+    if all(coords) and i == 10239:
         star_map.vertices = vertices
-        puzzle_actual_result = min_i_galaxy_size
+        print(i + 1)
         print(star_map.vertices_to_grid(wall=" "))
-        break
 
 
 # -------------------------------- Outputs / results -------------------------------- #
