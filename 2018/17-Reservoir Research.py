@@ -166,24 +166,24 @@ while flowing:
         break
     i += 1
 
-print("step", i)
-for y in range(max_y + 1, min_y - 1, -1):
-    for x in range(min_x - 2, max_x + 3):
-        if x + y * 1j in pools:
-            print("~", end="")
-        elif x + y * 1j in settled:
-            print("S", end="")
-        elif x + y * 1j in flowing:
-            print("F", end="")
-        elif x + y * 1j in pools:
-            print("~", end="")
-        elif x + y * 1j in wet_positions:
-            print("|", end="")
-        elif x + y * 1j in walls:
-            print("#", end="")
-        else:
-            print(".", end="")
-    print("")
+# print("step", i)
+# for y in range(max_y + 1, min_y - 1, -1):
+# for x in range(min_x - 2, max_x + 3):
+# if x + y * 1j in pools:
+# print("~", end="")
+# elif x + y * 1j in settled:
+# print("S", end="")
+# elif x + y * 1j in flowing:
+# print("F", end="")
+# elif x + y * 1j in pools:
+# print("~", end="")
+# elif x + y * 1j in wet_positions:
+# print("|", end="")
+# elif x + y * 1j in walls:
+# print("#", end="")
+# else:
+# print(".", end="")
+# print("")
 
 
 if part_to_test == 1:

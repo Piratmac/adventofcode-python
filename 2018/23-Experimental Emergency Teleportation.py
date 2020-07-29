@@ -181,13 +181,13 @@ else:
             if nb_spot > min_bots:
                 min_bots = nb_spot
                 best_dot = dot
-                print("Min bots updated to ", nb_spot, "for dot", dot)
+                # print("Min bots updated to ", nb_spot, "for dot", dot)
             elif nb_spot == min_bots:
                 if manhattan_distance((0, 0, 0), best_dot) > manhattan_distance(
                     (0, 0, 0), dot
                 ):
                     best_dot = dot
-                    print("Best dot set to ", dot)
+                    # print("Best dot set to ", dot)
 
         if cube_size == 1:
             # We can't divide it any further
@@ -211,7 +211,7 @@ else:
                 heapq.heappush(cubes, (-count_bots, cube_size, new_cube))
                 all_cubes.append((count_bots, cube_size, new_cube))
 
-    print("max power", min_bots)
+    # print("max power", min_bots)
     puzzle_actual_result = manhattan_distance((0, 0, 0), best_dot)
 
 

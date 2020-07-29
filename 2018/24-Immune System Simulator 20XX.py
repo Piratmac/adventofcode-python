@@ -178,7 +178,8 @@ while True:
         for uid in range(len(units)):
             if units[uid][-2] == "Immune System:":
                 units[uid][2] += boost
-        print("Applying boost", boost)
+        if verbose:
+            print("Applying boost", boost)
 
     while len(teams(units)) > 1:
         units_killed = 0
@@ -231,7 +232,8 @@ while True:
             winner = "None"
         else:
             winner = units[0][-2]
-        print("Boost", boost, " - Winner:", winner)
+        if verbose:
+            print("Boost", boost, " - Winner:", winner)
     if verbose:
         print([unit[0] for unit in units])
 

@@ -19,7 +19,7 @@ input_file = os.path.join(
 )
 test_data[test] = {
     "input": open(input_file, "r+").read().strip(),
-    "expected": ["Unknown", "Unknown"],
+    "expected": ["612", "485"],
 }
 
 # -------------------------------- Control program execution ------------------------- #
@@ -158,7 +158,7 @@ else:
         opcode = final_mapping[int(operation.split(" ")[0])]
         a, b, c = map(int, operation.split(" ")[1:])
 
-        print(operation, opcode, a, b, c)
+        # print(operation, opcode, a, b, c)
 
         if opcode == "addr":
             registers[c] = registers[a] + registers[b]

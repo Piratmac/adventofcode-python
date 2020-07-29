@@ -143,19 +143,19 @@ while i <= end:
     if i > 800 and i < 10 ** 8 and score in scores:
         repeats_every = i - scores.index(score) - 1 - 800
         i += (end - i) // repeats_every * repeats_every
-        print(
-            "repeats_every",
-            repeats_every,
-            "score",
-            score,
-            "index",
-            scores.index(score),
-            i,
-        )
+        # print(
+        # "repeats_every",
+        # repeats_every,
+        # "score",
+        # score,
+        # "index",
+        # scores.index(score),
+        # i,
+        # )
 
     if i > 800:
         scores.append(score)
-    print(i, score)
+    # print(i, score)
 
     i += 1
 

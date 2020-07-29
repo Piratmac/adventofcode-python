@@ -88,7 +88,7 @@ if part_to_test == 1:
 
     groups = graph.dfs_groups()
 
-    print(groups)
+    # print(groups)
     puzzle_actual_result = len(groups)
 
 

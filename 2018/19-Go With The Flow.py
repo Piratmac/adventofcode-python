@@ -104,14 +104,6 @@ if part_to_test == 1:
 
         print(i, pointer, operation, registers)
 
-        if i == 150:
-            break
-        if i % 10000 == 0:
-            print(i, pointer, operation, registers)
-            # if registers[2] < registers[3]-1250:
-            # registers[2] += 1250 * ((registers[3] - registers[2]) // 1250-1)
-            # print (i, pointer, operation, registers, 'after')
-
         i += 1
 
     puzzle_actual_result = registers[0]
@@ -129,7 +121,7 @@ else:
     for i in range(0, 200):
 
         operation = program[registers[pointer]]
-        print(i, pointer, operation, registers)
+        # print(i, pointer, operation, registers)
 
         opcode = operation.split(" ")[0]
         a, b, c = map(int, operation.split(" ")[1:])

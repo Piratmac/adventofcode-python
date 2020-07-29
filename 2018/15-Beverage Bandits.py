@@ -64,9 +64,9 @@ test_data[test] = {
 
 # -------------------------------- Control program execution ------------------------- #
 
-case_to_test = 4
+case_to_test = "real"
 part_to_test = 2
-verbose_level = 2
+verbose_level = 1
 
 # -------------------------------- Initialize some variables ------------------------- #
 
