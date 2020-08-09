@@ -118,6 +118,16 @@ class Player:
             if c.type == self.type and c != self and c.alive
         ]
         ennemies = [c.position for c in creatures if c.type != self.type and c.alive]
+
+        # Check if there is an ennemy next to me => no movement in this case
+        ennemy_next_to_me = [
+            self.position
+            for dir in complex_utils.directions_straight
+            if self.position + dir in ennemies
+        ]
+        if ennemy_next_to_me:
+            return
+
         self.graph.add_traps(ennemies)
         self.graph.add_walls(allies)
 
