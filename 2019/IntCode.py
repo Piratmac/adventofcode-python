@@ -12,6 +12,7 @@ class IntCode:
         "06": 3,
         "07": 4,
         "08": 4,
+        "09": 2,
         "99": 1,
     }
 
@@ -22,6 +23,7 @@ class IntCode:
         # Current state
         self.pointer = 0
         self.state = "Running"
+        self.relative_base = 0
 
         # Current instruction modes
         self.modes = "000"
@@ -58,18 +60,63 @@ class IntCode:
         ]
 
     def get_value(self, param_position):
+        assert self.modes[2 - (param_position - 1)] in "012"
+        try:
+            if self.modes[2 - (param_position - 1)] == "0":
+                return self.instructions[
+                    self.instructions[self.pointer + param_position]
+                ]
+            elif self.modes[2 - (param_position - 1)] == "1":
+                return self.instructions[self.pointer + param_position]
+            else:
+                return self.instructions[
+                    self.relative_base
+                    + self.instructions[self.pointer + param_position]
+                ]
+        except:
+            return 0
+
+    def set_value(self, param_position, value):
+        assert self.modes[2 - (param_position - 1)] in "02"
         if self.modes[2 - (param_position - 1)] == "0":
-            return self.instructions[self.instructions[self.pointer + param_position]]
+            try:
+                self.instructions[
+                    self.instructions[self.pointer + param_position]
+                ] = value
+            except:
+                self.instructions += [0] * (
+                    self.instructions[self.pointer + param_position]
+                    - len(self.instructions)
+                    + 1
+                )
+                self.instructions[
+                    self.instructions[self.pointer + param_position]
+                ] = value
         else:
-            return self.instructions[self.pointer + param_position]
+            try:
+                self.instructions[
+                    self.relative_base
+                    + self.instructions[self.pointer + param_position]
+                ] = value
+            except:
+                self.instructions += [0] * (
+                    self.relative_base
+                    + self.instructions[self.pointer + param_position]
+                    - len(self.instructions)
+                    + 1
+                )
+                self.instructions[
+                    self.relative_base
+                    + self.instructions[self.pointer + param_position]
+                ] = value
 
     def op_01(self, instr):
-        self.instructions[instr[3]] = self.get_value(1) + self.get_value(2)
+        self.set_value(3, self.get_value(1) + self.get_value(2))
         self.pointer += self.instr_length["01"]
         self.state = "Running"
 
     def op_02(self, instr):
-        self.instructions[instr[3]] = self.get_value(1) * self.get_value(2)
+        self.set_value(3, self.get_value(1) * self.get_value(2))
         self.pointer += self.instr_length["02"]
         self.state = "Running"
 
@@ -77,7 +124,7 @@ class IntCode:
         if len(self.inputs) == 0:
             self.state = "Paused"
             return
-        self.instructions[instr[1]] = self.inputs.pop(0)
+        self.set_value(1, self.inputs.pop(0))
         self.pointer += self.instr_length["03"]
         self.state = "Running"
 
@@ -102,18 +149,23 @@ class IntCode:
 
     def op_07(self, instr):
         if self.get_value(1) < self.get_value(2):
-            self.instructions[instr[3]] = 1
+            self.set_value(3, 1)
         else:
-            self.instructions[instr[3]] = 0
+            self.set_value(3, 0)
         self.pointer += self.instr_length["07"]
         self.state = "Running"
 
     def op_08(self, instr):
         if self.get_value(1) == self.get_value(2):
-            self.instructions[instr[3]] = 1
+            self.set_value(3, 1)
         else:
-            self.instructions[instr[3]] = 0
+            self.set_value(3, 0)
         self.pointer += self.instr_length["08"]
+        self.state = "Running"
+
+    def op_09(self, instr):
+        self.relative_base += self.get_value(1)
+        self.pointer += self.instr_length["09"]
         self.state = "Running"
 
     def op_99(self, instr):
@@ -139,6 +191,7 @@ class IntCode:
         if self.reference != "":
             output += "Computer # " + str(self.reference)
         output += "\n" + "Instructions: " + ",".join(map(str, self.instructions))
+        output += "\n" + "Relative base: " + str(self.relative_base)
         output += "\n" + "Inputs: " + ",".join(map(str, self.all_inputs))
         output += "\n" + "Outputs: " + ",".join(map(str, self.outputs))
         return output
