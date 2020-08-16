@@ -116,6 +116,8 @@ def complex_sort(complexes, mode=""):
     elif mode == "reading":
         complexes.sort(key=lambda a: (-a.imag, a.real))
     # Sorts by distance from 0,0 (kind of polar coordinates)
+    elif mode == "manhattan":
+        complexes.sort(key=lambda a: manhattan_distance(0, a))
     else:
         complexes.sort(key=lambda a: sqrt(a.imag ** 2 + a.real ** 2))
     return complexes
