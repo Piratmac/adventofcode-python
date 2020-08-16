@@ -1,11 +1,8 @@
 class IntCode:
-    instructions = []
-    pointer = 0
-    state = "Running"
-    modes = "000"
-    inputs = []
-    outputs = []
+    # Verbosity
     verbose_level = 0
+
+    # Count of parameters per opcode
     instr_length = {
         "01": 4,
         "02": 4,
@@ -18,13 +15,37 @@ class IntCode:
         "99": 1,
     }
 
-    def __init__(self, instructions):
+    def __init__(self, instructions, reference=""):
         self.instructions = list(map(int, instructions.split(",")))
+        self.reference = reference
+
+        # Current state
+        self.pointer = 0
+        self.state = "Running"
+
+        # Current instruction modes
+        self.modes = "000"
+
+        # Inputs and outputs
+        self.inputs = []
+        self.all_inputs = []
+        self.outputs = []
 
     def reset(self, instructions):
         self.instructions = list(map(int, instructions.split(",")))
         self.pointer = 0
         self.state = "Running"
+
+    def restart(self):
+        self.state = "Running"
+
+    def add_input(self, value):
+        try:
+            self.inputs += value
+            self.all_inputs += value
+        except:
+            self.inputs.append(value)
+            self.all_inputs.append(value)
 
     def get_opcode(self):
         instr = self.instructions[self.pointer]
@@ -53,6 +74,9 @@ class IntCode:
         self.state = "Running"
 
     def op_03(self, instr):
+        if len(self.inputs) == 0:
+            self.state = "Paused"
+            return
         self.instructions[instr[1]] = self.inputs.pop(0)
         self.pointer += self.instr_length["03"]
         self.state = "Running"
@@ -111,9 +135,18 @@ class IntCode:
                 print("Instructions:", ",".join(map(str, self.instructions)))
 
     def export(self):
-        instr = ",".join(map(str, self.instructions))
-        inputs = ",".join(map(str, self.inputs))
-        outputs = ",".join(map(str, self.outputs))
-        return (
-            "Instructions: " + instr + "\nInputs: " + inputs + "\nOutputs: " + outputs
-        )
+        output = ""
+        if self.reference != "":
+            output += "Computer # " + str(self.reference)
+        output += "\n" + "Instructions: " + ",".join(map(str, self.instructions))
+        output += "\n" + "Inputs: " + ",".join(map(str, self.all_inputs))
+        output += "\n" + "Outputs: " + ",".join(map(str, self.outputs))
+        return output
+
+    def export_io(self):
+        output = ""
+        if self.reference != "":
+            output += "Computer # " + str(self.reference)
+        output += "\n" + "Inputs: " + ",".join(map(str, self.all_inputs))
+        output += "\n" + "Outputs: " + ",".join(map(str, self.outputs))
+        return output
