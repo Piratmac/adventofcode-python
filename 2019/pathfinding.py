@@ -86,7 +86,7 @@ class Graph:
         Searches the grid for some items
 
         :param string grid: The grid in which to search
-        :param Boolean items: The items to search
+        :param list items: The items to search
         :return: A dictionnary of the items found
         """
         items_found = {}
@@ -126,7 +126,7 @@ class Graph:
                         grid += "X"
                     else:
                         try:
-                            grid += self.vertices.get(x + y * j, wall)
+                            grid += str(self.vertices.get(x + y * j, wall))
                         except AttributeError:
                             if x + y * j in self.vertices:
                                 grid += "."
