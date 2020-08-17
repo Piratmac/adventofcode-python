@@ -1,7 +1,7 @@
 """
 Small library for complex numbers
 """
-from math import sqrt
+from math import sqrt, atan2
 
 
 class ReturnTypeWrapper(type):
@@ -50,6 +50,12 @@ class SuperComplex(complex):
 
     def __sub__(self, no):
         return SuperComplex(self.real - no.real, self.imag - no.imag)
+
+    def phase(self):
+        return atan2(self.imag, self.real)
+
+    def amplitude(self):
+        return sqrt(self.imag ** 2 + self.real ** 2)
 
 
 j = SuperComplex(1j)
