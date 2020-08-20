@@ -78,6 +78,10 @@ directions_diagonals = directions_straight + [
     southwest,
 ]
 
+# Easy way of representing direction
+accent_to_dir = {"^": north, "v": south, ">": east, "<": west}
+dir_to_accent = {accent_to_dir[x]: x for x in accent_to_dir}
+
 # To be multiplied by the current cartinal direction
 relative_directions = {
     "left": j,
