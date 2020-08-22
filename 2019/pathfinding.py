@@ -162,7 +162,10 @@ class Graph:
         for vertex in vertices:
             if vertex in self.edges:
                 del self.edges[vertex]
-                self.vertices.remove(vertex)
+                if isinstance(self.vertices, list):
+                    self.vertices.remove(vertex)
+                else:
+                    del self.vertices[vertex]
                 changed = True
 
         self.edges = {
@@ -489,12 +492,17 @@ class WeightedGraph(Graph):
         heapq.heapify(frontier)
         self.distance_from_start = {start: 0}
         self.came_from = {start: None}
+        min_distance = float("inf")
 
         while frontier:
             current_distance, vertex = heapq.heappop(frontier)
 
             neighbors = self.neighbors(vertex)
             if not neighbors:
+                continue
+
+            # No need to explore neighbors if we already found a shorter path to the end
+            if current_distance > min_distance:
                 continue
 
             for neighbor, weight in neighbors.items():
@@ -510,6 +518,9 @@ class WeightedGraph(Graph):
                 # Adding for final search
                 self.distance_from_start[neighbor] = current_distance + weight
                 self.came_from[neighbor] = vertex
+
+                if neighbor == end:
+                    min_distance = min(min_distance, current_distance + weight)
 
         return end is None or end in self.distance_from_start
 
