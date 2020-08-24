@@ -35,6 +35,9 @@ class IntCode:
 
     def reset(self, instructions):
         self.instructions = list(map(int, instructions.split(",")))
+        self.inputs = []
+        self.all_inputs = []
+        self.outputs = []
         self.pointer = 0
         self.state = "Running"
 
