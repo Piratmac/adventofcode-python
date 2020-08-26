@@ -175,8 +175,10 @@ class IntCode:
         self.pointer += self.instr_length["99"]
         self.state = "Stopped"
 
-    def run(self):
-        while self.state == "Running":
+    def run(self, nb_instructions=float("inf")):
+        i = 0
+        while self.state == "Running" and i < nb_instructions:
+            i += 1
             opcode_full = self.get_opcode()
             opcode = opcode_full[-2:]
             self.modes = opcode_full[:-2]
