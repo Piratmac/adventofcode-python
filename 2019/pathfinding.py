@@ -12,14 +12,9 @@ class NegativeWeightCycle(Exception):
 
 
 class Graph:
-    vertices = []
-    edges = {}
-    distance_from_start = {}
-    came_from = {}
-
     def __init__(self, vertices=[], edges={}):
-        self.vertices = vertices
-        self.edges = edges
+        self.vertices = vertices.copy()
+        self.edges = edges.copy()
 
     def neighbors(self, vertex):
         """
@@ -57,6 +52,7 @@ class Graph:
         :return: True if the grid was converted
         """
         self.vertices = []
+        self.edges = {}
         y = 0
 
         for line in grid.splitlines():
@@ -151,7 +147,7 @@ class Graph:
 
         return changed
 
-    def add_walls(self, vertices):
+    def add_walls(self, walls):
         """
         Adds walls - useful for modification of map
 
@@ -159,7 +155,7 @@ class Graph:
         :return: True if successful, False if no vertex found
         """
         changed = False
-        for vertex in vertices:
+        for vertex in walls:
             if vertex in self.edges:
                 del self.edges[vertex]
                 if isinstance(self.vertices, list):
@@ -169,7 +165,7 @@ class Graph:
                 changed = True
 
         self.edges = {
-            source: [target for target in self.edges[source] if target not in vertices]
+            source: [target for target in self.edges[source] if target not in walls]
             for source in self.edges
         }
 
