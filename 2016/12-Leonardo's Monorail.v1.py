@@ -50,33 +50,37 @@ if part_to_test == 2:
     registers["c"] = 1
 
 
-instructions = [line.split(" ") for line in puzzle_input.split("\n")]
+instructions = puzzle_input.split("\n")
 i = 0
 while True:
-    ins = instructions[i]
+    instruction = instructions[i]
     i += 1
 
-    if ins[0] == "cpy":
+    if instruction[0:3] == "cpy":
+        _, val, target = instruction.split(" ")
         try:
-            registers[ins[2]] = int(ins[1])
+            registers[target] = int(val)
         except ValueError:
-            registers[ins[2]] = registers[ins[1]]
+            registers[target] = registers[val]
 
-    elif ins[0] == "inc":
-        registers[ins[1]] += 1
-    elif ins[0] == "dec":
-        registers[ins[1]] -= 1
+    elif instruction[0:3] == "inc":
+        _, target = instruction.split(" ")
+        registers[target] += 1
+    elif instruction[0:3] == "dec":
+        _, target = instruction.split(" ")
+        registers[target] -= 1
 
-    elif ins[0] == "jnz":
-        if ins[1] == "0":
+    elif instruction[0:3] == "jnz":
+        _, target, jump = instruction.split(" ")
+        if target == "0":
             pass
         else:
             try:
-                if int(ins[1]):
-                    i += int(ins[2]) - 1  # -1 to compensate for what we added before
+                if int(target):
+                    i = i + int(jump) - 1  # -1 to compensate for what we added before
             except ValueError:
-                if registers[ins[1]] != 0:
-                    i += int(ins[2]) - 1  # -1 to compensate for what we added before
+                if registers[target] != 0:
+                    i = i + int(jump) - 1  # -1 to compensate for what we added before
 
     if i >= len(instructions):
         break
