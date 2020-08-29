@@ -96,7 +96,10 @@ while puzzle_actual_result == "Unknown":
         computers[0].add_input(nat_queue)
         y_sent = nat_queue[-1]
 
-        print("NAT sends", nat_queue, "- Previous Y values sent:", nat_y_values_sent)
+        if verbose_level >= 1:
+            print(
+                "NAT sends", nat_queue, "- Previous Y values sent:", nat_y_values_sent
+            )
         nat_queue = []
         if nat_y_values_sent and y_sent == nat_y_values_sent[-1]:
             puzzle_actual_result = y_sent
