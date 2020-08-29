@@ -55,33 +55,49 @@ if part_to_test == 1:
 
 else:
     computer.instructions[0] = 2
+    blocks_left = 1
     score = 0
 
-    while computer.state != "Stopped":
+    vertices = {}
+
+    while blocks_left > 0 and computer.state != "Failure":
         computer.run()
 
-        ball_x = 0
-        paddle_x = 0
+        # Check if we can still play
+        blocks_left = 0
+        ball_position = 0
+        paddle_position = 0
         for i in range(len(computer.outputs) // 3):
-            # Ball position
-            if computer.outputs[i * 3 + 2] == 4:
-                ball_x = computer.outputs[i * 3]
-            # Paddle position
-            elif computer.outputs[i * 3 + 2] == 3:
-                paddle_x = computer.outputs[i * 3]
 
+            vertices[
+                computer.outputs[i * 3] - j * computer.outputs[i * 3 + 1]
+            ] = computer.outputs[i * 3 + 2]
+            # The ball has not fallen
+            if computer.outputs[i * 3 + 2] == 4:
+                ball_position = (
+                    computer.outputs[i * 3] - j * computer.outputs[i * 3 + 1]
+                )
+                if ball_position.imag < -21:
+                    print("Failed")
+                    computer.state = "Failure"
+                    break
             # Check the score
             elif computer.outputs[i * 3] == -1 and computer.outputs[i * 3 + 1] == 0:
                 score = computer.outputs[i * 3 + 2]
-        computer.outputs = []
 
-        if computer.state == "Stopped":
-            break
+            # Store the paddle position
+            elif computer.outputs[i * 3 + 2] == 3:
+                paddle_position = (
+                    computer.outputs[i * 3] - j * computer.outputs[i * 3 + 1]
+                )
+
+        # There are still blocks to break
+        blocks_left = len([x for x in vertices if vertices[x] == 2])
 
         # Move paddle
-        if paddle_x < ball_x:
+        if paddle_position.real < ball_position.real:
             joystick = 1
-        elif paddle_x > ball_x:
+        elif paddle_position.real > ball_position.real:
             joystick = -1
         else:
             joystick = 0
@@ -105,6 +121,10 @@ else:
 
         # 'Restart' the computer to process the input
         computer.restart()
+
+    # Outputs the grid (just for fun)
+    grid.vertices = {x: tiles.get(vertices[x], vertices[x]) for x in vertices}
+    print(grid.vertices_to_grid())
 
     puzzle_actual_result = score
 

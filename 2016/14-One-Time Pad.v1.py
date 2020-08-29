@@ -24,7 +24,7 @@ test_data[test] = {
 # -------------------------------- Control program execution -------------------------------- #
 
 case_to_test = "real"
-part_to_test = 1
+part_to_test = 2
 verbose_level = 1
 
 # -------------------------------- Initialize some variables -------------------------------- #
@@ -35,7 +35,6 @@ puzzle_actual_result = "Unknown"
 
 
 # -------------------------------- Actual code execution -------------------------------- #
-
 
 if part_to_test == 1:
     index = 0
@@ -63,16 +62,17 @@ if part_to_test == 1:
 
 
 else:
-    # hashes = []
+    hashes = []
     hashes_first_triplet = {}
-    hashes_quintuplets = []
-    keys_found = 0
+    hashes_quintuplets = {}
+    index = -1
+    found_keys = 0
 
-    i = 0
-    while keys_found < 64:
+    for i in range(30000):
         hash_text = puzzle_input + str(i)
-        for _ in range(2017):
+        for y in range(2017):
             hash_text = hashlib.md5(hash_text.encode("utf-8")).hexdigest()
+        hashes.append(hash_text)
 
         triplets = [x for x in "0123456789abcdef" if x * 3 in hash_text]
 
@@ -80,19 +80,22 @@ else:
             first_triplet_position = min([hash_text.find(x * 3) for x in triplets])
             hashes_first_triplet[i] = hash_text[first_triplet_position]
 
-        hashes_quintuplets.append(
-            "".join(x for x in "0123456789abcdef" if x * 5 in hash_text)
-        )
+        quintuplets = [x for x in "0123456789abcdef" if x * 5 in hash_text]
 
-        if i > 1000:
-            if i - 1001 in hashes_first_triplet:
-                if hashes_first_triplet[i - 1001] in "".join(
-                    hashes_quintuplets[i - 1000 :]
-                ):
-                    keys_found += 1
+        if quintuplets:
+            hashes_quintuplets[i] = quintuplets
 
-        i += 1
-    puzzle_actual_result = i - 1002
+    for index, triplet in hashes_first_triplet.items():
+        for i in range(1, 1000):
+            if index + i in hashes_quintuplets:
+                if triplet in hashes_quintuplets[index + i]:
+                    found_keys += 1
+                    break
+
+        if found_keys == 64:
+            puzzle_actual_result = index
+            break
+
 
 # -------------------------------- Outputs / results -------------------------------- #
 
