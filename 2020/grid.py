@@ -86,7 +86,7 @@ class Grid:
         The dots will have x - y * 1j as coordinates
 
         :param string text: The text to convert
-        :param sequence ignore_terrain: The grid to convert
+        :param sequence ignore_terrain: Types of terrain to ignore (useful for walls)
         """
         self.dots = {}
 

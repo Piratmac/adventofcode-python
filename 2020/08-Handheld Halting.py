@@ -92,7 +92,7 @@ class Program:
 
     def run_once(self):
         instr = self.instructions[self.current_line]
-        print("Before", self.current_line, self.accumulator, instr)
+        # print("Before", self.current_line, self.accumulator, instr)
         self.operations[instr[0]](instr)
 
     def nop(self, instr):

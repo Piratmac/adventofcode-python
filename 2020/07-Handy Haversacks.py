@@ -145,7 +145,7 @@ else:
                 gold_contains["total"] += gold_contains[combination["out"]]
                 del gold_contains[combination["out"]]
 
-        print(sum(gold_contains.values()), gold_contains)
+    #        print(sum(gold_contains.values()), gold_contains)
 
     puzzle_actual_result = gold_contains["total"]
 

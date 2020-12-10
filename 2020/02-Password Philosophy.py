@@ -39,31 +39,20 @@ test_data[test] = {
     "expected": ["2", "1"],
 }
 
-test = "WD"
+test = "real"
 input_file = os.path.join(
     os.path.dirname(__file__),
     "Inputs",
-    os.path.basename(__file__).replace(".py", ".WD.txt"),
+    os.path.basename(__file__).replace(".py", ".txt"),
 )
 test_data[test] = {
     "input": open(input_file, "r+").read(),
-    "expected": ["Unknown", "Unknown"],
-}
-
-test = "Twitter"
-input_file = os.path.join(
-    os.path.dirname(__file__),
-    "Inputs",
-    os.path.basename(__file__).replace(".py", ".Twitter.txt"),
-)
-test_data[test] = {
-    "input": open(input_file, "r+").read(),
-    "expected": ["447", "Unknown"],
+    "expected": ["447", "249"],
 }
 
 # -------------------------------- Control program execution ------------------------- #
 
-case_to_test = "Twitter"
+case_to_test = "real"
 part_to_test = 2
 
 # -------------------------------- Initialize some variables ------------------------- #

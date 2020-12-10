@@ -106,68 +106,52 @@ puzzle_actual_result = "Unknown"
 
 # -------------------------------- Actual code execution ----------------------------- #
 
-required_fields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+
+class Passport:
+    required_fields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
+
+    validations = {
+        "byr": lambda year: year in range(1920, 2002 + 1),
+        "iyr": lambda year: year in range(2010, 2020 + 1),
+        "eyr": lambda year: year in range(2020, 2030 + 1),
+        "hgt": lambda data: (
+            data[-2:] == "cm" and int(data[:-2]) in range(150, 193 + 1)
+        )
+        or (data[-2:] == "in" and int(data[:-2]) in range(59, 76 + 1)),
+        "hcl": lambda data: re.match("^#[0-9a-f]{6}$", data),
+        "ecl": lambda data: data in ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"],
+        "pid": lambda data: re.match("^[0-9]{9}$", data),
+    }
+
+    def __init__(self, data):
+        self.fields = defaultdict(str)
+        for element in data.split():
+            if element[:3] in ("byr", "iyr", "eyr"):
+                try:
+                    self.fields[element[:3]] = int(element[4:])
+                except:
+                    self.fields[element[:3]] = element[4:]
+            else:
+                self.fields[element[:3]] = element[4:]
+
+    def has_required_data(self):
+        return all([x in self.fields for x in self.required_fields])
+
+    def is_valid(self):
+        return all([self.validations[x](self.fields[x]) for x in self.required_fields])
+
 
 passports = []
-i = 0
-for string in puzzle_input.split("\n"):
-    if len(passports) >= i:
-        passports.append("")
-    if string == "":
-        i = i + 1
-    else:
-        passports[i] = passports[i] + " " + string
+for string in puzzle_input.split("\n\n"):
+    passports.append(Passport(string))
 
 valid_passports = 0
 
 if part_to_test == 1:
-    for passport in passports:
-        if all([x + ":" in passport for x in required_fields]):
-            valid_passports = valid_passports + 1
-
+    valid_passports = sum([1 for x in passports if x.has_required_data()])
 
 else:
-    for passport in passports:
-        if all([x + ":" in passport for x in required_fields]):
-            fields = passport.split(" ")
-            score = 0
-            for field in fields:
-                data = field.split(":")
-                if data[0] == "byr":
-                    year = int(data[1])
-                    if year >= 1920 and year <= 2002:
-                        score = score + 1
-                elif data[0] == "iyr":
-                    year = int(data[1])
-                    if year >= 2010 and year <= 2020:
-                        score = score + 1
-                elif data[0] == "eyr":
-                    year = int(data[1])
-                    if year >= 2020 and year <= 2030:
-                        score = score + 1
-                elif data[0] == "hgt":
-                    size = ints(data[1])[0]
-                    if data[1][-2:] == "cm":
-                        if size >= 150 and size <= 193:
-                            score = score + 1
-                    elif data[1][-2:] == "in":
-                        if size >= 59 and size <= 76:
-                            score = score + 1
-                elif data[0] == "hcl":
-                    if re.match("#[0-9a-f]{6}", data[1]) and len(data[1]) == 7:
-                        score = score + 1
-                        print(data[0], passport)
-                elif data[0] == "ecl":
-                    if data[1] in ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]:
-                        score = score + 1
-                        print(data[0], passport)
-                elif data[0] == "pid":
-                    if re.match("[0-9]{9}", data[1]) and len(data[1]) == 9:
-                        score = score + 1
-                        print(data[0], passport)
-            print(passport, score)
-            if score == 7:
-                valid_passports = valid_passports + 1
+    valid_passports = sum([1 for x in passports if x.is_valid()])
 
 puzzle_actual_result = valid_passports
 

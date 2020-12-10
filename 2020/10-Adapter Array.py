@@ -93,7 +93,7 @@ input_file = os.path.join(
 )
 test_data[test] = {
     "input": open(input_file, "r+").read(),
-    "expected": ["Unknown", "Unknown"],
+    "expected": ["2240", "99214346656768"],
 }
 
 
@@ -142,7 +142,7 @@ else:
     for joltage in joltages:
         edges[joltage] = [x for x in joltages if x < joltage and x >= joltage - 3]
 
-    print(edges)
+    #    print(edges)
 
     @lru_cache(maxsize=len(joltages))
     def count_paths(position):
@@ -162,3 +162,5 @@ print("Case :", case_to_test, "- Part", part_to_test)
 print("Expected result : " + str(puzzle_expected_result))
 print("Actual result   : " + str(puzzle_actual_result))
 # Date created: 2020-12-10 06:00:02.437611
+# Part 1: 2020-12-10 06:04:42
+# Part 2: 2020-12-10 06:14:12

@@ -109,7 +109,7 @@ if part_to_test == 2:
         if number_sum < invalid_number:
             for b in range(1, len(numbers) - a):
                 number_sum += numbers[a + b]
-                print(a, b, number_sum, invalid_number)
+                #                print(a, b, number_sum, invalid_number)
                 if number_sum == invalid_number:
                     puzzle_actual_result = min(numbers[a : a + b + 1]) + max(
                         numbers[a : a + b + 1]
