@@ -75,7 +75,7 @@ input_file = os.path.join(
 )
 test_data[test] = {
     "input": open(input_file, "r+").read(),
-    "expected": ["32835", "Unknown"],
+    "expected": ["32835", "514662805187"],
 }
 
 
@@ -162,8 +162,8 @@ else:
                         pass
         field_order[field] = possible_order
 
-    for val in field_order:
-        print(field_order[val], val)
+    # #for val in field_order:
+    # #print(field_order[val], val)
     while any(len(val) > 1 for val in field_order.values()):
         new_field_order = deepcopy(field_order)
         for field in field_order:
@@ -180,13 +180,13 @@ else:
         field_order = deepcopy(new_field_order)
 
     ticket_value = 1
-    for val in field_order:
-        print(field_order[val], val)
+    # #for val in field_order:
+    # #print(field_order[val], val)
     for field in validations.keys():
         if field[:9] == "departure":
-            print(
-                my_ticket, field, field_order[field], my_ticket[field_order[field][0]]
-            )
+            # #print(
+            # #my_ticket, field, field_order[field], my_ticket[field_order[field][0]]
+            # #)
             ticket_value *= my_ticket[field_order[field][0]]
 
     puzzle_actual_result = ticket_value

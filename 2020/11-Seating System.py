@@ -131,7 +131,7 @@ if part_to_test == 1:
 
         seats = copy.deepcopy(new_seats)
         new_seats.text_to_dots(puzzle_input)
-        print(i)
+        # #print(i)
 
     puzzle_actual_result = sum([1 for d in seats.dots if seats.dots[d].terrain == "#"])
 
@@ -196,7 +196,7 @@ else:
             break
 
         seats = copy.deepcopy(new_seats)
-        print(i)
+        # #print(i)
 
     puzzle_actual_result = sum([1 for d in seats.dots if seats.dots[d].terrain == "#"])
 
