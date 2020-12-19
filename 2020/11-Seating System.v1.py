@@ -138,52 +138,67 @@ if part_to_test == 1:
 
 else:
 
-    def get_neighbors_map(grid, dot):
+    def get_neighbors_map(dot):
         neighbors = []
-        for direction in directions_diagonals:
+        if dot.grid.width is None:
+            dot.grid.get_size()
+        for direction in dot.allowed_directions:
             neighbor = dot + direction
-            while neighbor in grid.dots:
-                if grid.dots[neighbor] in ("L", "#"):
-                    neighbors.append(neighbor)
+            while neighbor is not None:
+                if neighbor.terrain in ("L", "#"):
+                    neighbors.append(neighbor.position)
                     break
                 else:
                     neighbor += direction
         return neighbors
 
     seats = grid.Grid()
+    seats.all_directions = directions_diagonals
     seats.text_to_dots(puzzle_input)
-    seats.width = len(puzzle_input.split("\n")[0])
-    seats.height = len(puzzle_input.split("\n"))
+    seats.neighbors_map = {
+        dot: get_neighbors_map(seats.dots[dot]) for dot in seats.dots
+    }
 
-    seats.dots = {dot: seats.dots[dot].terrain for dot in seats.dots}
-    seats.neighbors_map = {dot: get_neighbors_map(seats, dot) for dot in seats.dots}
+    new_seats = copy.deepcopy(seats)
 
-    new_seats = grid.Grid()
-    new_seats.dots = seats.dots.copy()
+    def get_neighbors(self):
+        return {
+            self.grid.dots[neighbor]: 1
+            for neighbor in self.grid.neighbors_map[self.position]
+        }
 
-    # #copy.deepcopy(seats)
+    dot.Dot.get_neighbors = get_neighbors
+
+    i = 0
 
     while True:
-        for dot, terrain in seats.dots.items():
-            if terrain == "L" and all(
-                [seats.dots[d] in ("L", ".") for d in seats.neighbors_map[dot]]
+        i += 1
+        watch = [2]
+        for dot in seats.dots:
+            if seats.dots[dot].terrain == "L" and all(
+                [d.terrain in ("L", ".") for d in seats.dots[dot].get_neighbors()]
             ):
-                new_seats.dots[dot] = "#"
+                new_seats.dots[dot].terrain = "#"
             elif (
-                terrain == "#"
-                and sum([1 for d in seats.neighbors_map[dot] if seats.dots[d] == "#"])
+                seats.dots[dot].terrain == "#"
+                and sum(
+                    [1 for d in seats.dots[dot].get_neighbors() if d.terrain == "#"]
+                )
                 >= 5
             ):
-                new_seats.dots[dot] = "L"
+                new_seats.dots[dot].terrain = "L"
             else:
-                new_seats.dots[dot] = terrain
+                new_seats.dots[dot].terrain = seats.dots[dot].terrain
 
-        if all([seats.dots[d] == new_seats.dots[d] for d in seats.dots]):
+        if all(
+            [seats.dots[d].terrain == new_seats.dots[d].terrain for d in seats.dots]
+        ):
             break
 
-        seats.dots = new_seats.dots.copy()
+        seats = copy.deepcopy(new_seats)
+        # #print(i)
 
-    puzzle_actual_result = sum([1 for d in seats.dots if seats.dots[d] == "#"])
+    puzzle_actual_result = sum([1 for d in seats.dots if seats.dots[d].terrain == "#"])
 
 
 # -------------------------------- Outputs / results --------------------------------- #

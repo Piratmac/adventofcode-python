@@ -95,8 +95,8 @@ class Dot_3D:
         return sum([1 for neighbor in self.neighbors() if neighbor.state == "#"])
 
 
-def active_neighbors(active_grid, dot):
-    return sum([1 for neighbor in neighbors[dot] if neighbor in active_grid])
+def active_neighbors(grid, dot):
+    return sum([1 for neighbor in neighbors[dot] if grid[neighbor] == "#"])
 
 
 if part_to_test == 1:
@@ -148,41 +148,47 @@ if part_to_test == 1:
 
 
 else:
+    margin = 7
     size = len(puzzle_input.split("\n"))
-    active_grid = set()
+    grid = {
+        (x, y, z, w): "."
+        for x in range(-margin, size + margin)
+        for y in range(-margin, size + margin)
+        for z in range(-margin, size + margin)
+        for w in range(-margin, size + margin)
+    }
 
-    @lru_cache(None)
-    def neighbors(dot):
-        return set(
+    neighbors = {
+        (dot[0], dot[1], dot[2], dot[3]): [
             (dot[0] + a, dot[1] + b, dot[2] + c, dot[3] + d)
             for a in range(-1, 2)
             for b in range(-1, 2)
             for c in range(-1, 2)
             for d in range(-1, 2)
             if (a, b, c, d) != (0, 0, 0, 0)
-        )
+            and (dot[0] + a, dot[1] + b, dot[2] + c, dot[3] + d) in grid
+        ]
+        for dot in grid
+    }
 
     for y, line in enumerate(puzzle_input.split("\n")):
         for x, cell in enumerate(line):
-            if cell == "#":
-                active_grid.add((x, y, 0, 0))
+            grid[(x, y, 0, 0)] = cell
 
     for cycle in range(6):
-        still_active = set(
-            dot
-            for dot in active_grid
-            if sum([1 for n in neighbors(dot) if n in active_grid]) in (2, 3)
-        )
-        # #print (active_grid, still_active)
-        all_neighbors = set().union(*(neighbors(dot) for dot in active_grid))
-        newly_active = set(
-            dot
-            for dot in all_neighbors
-            if sum([1 for n in neighbors(dot) if n in active_grid]) == 3
-        )
-        active_grid = still_active.union(newly_active)
+        new_grid = grid.copy()
 
-    puzzle_actual_result = len(active_grid)
+        for dot in grid:
+            if grid[dot] == "#" and active_neighbors(grid, dot) in (2, 3,):
+                new_grid[dot] = "#"
+            elif grid[dot] == "#":
+                new_grid[dot] = "."
+            elif grid[dot] == "." and active_neighbors(grid, dot) == 3:
+                new_grid[dot] = "#"
+
+        grid = new_grid.copy()
+
+    puzzle_actual_result = Counter(grid.values())["#"]
 
 
 # -------------------------------- Outputs / results --------------------------------- #
