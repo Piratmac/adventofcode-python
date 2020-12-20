@@ -204,6 +204,139 @@ class Grid:
                         if (dot, direction) in self.dots:
                             self.dots[(dot, direction)].set_wall(True)
 
+    def get_borders(self):
+        """
+        Gets the borders of the image
+
+        Only the terrain of the dot will be sent back
+        This will be returned in left-to-right, up to bottom reading order
+        Newline characters are not included
+
+        :return: a set of coordinates
+        """
+
+        if not self.dots:
+            return (0, 0, 0, 0)
+        x_vals = set(map(int, (dot.position.real for dot in self.dots.values())))
+        y_vals = set(map(int, (dot.position.imag for dot in self.dots.values())))
+
+        min_x, max_x = int(min(x_vals)), int(max(x_vals))
+        min_y, max_y = int(min(y_vals)), int(max(y_vals))
+
+        borders = []
+        borders.append([x + 1j * max_y for x in sorted(x_vals)])
+        borders.append([max_x + 1j * y for y in sorted(y_vals)])
+        borders.append([x + 1j * min_y for x in sorted(x_vals)])
+        borders.append([min_x + 1j * y for y in sorted(y_vals)])
+
+        borders_text = []
+        for border in borders:
+            borders_text.append(
+                Grid({pos: self.dots[pos].terrain for pos in border})
+                .dots_to_text()
+                .replace("\n", "")
+            )
+
+        return borders_text
+
+    def rotate(self, angles):
+        """
+        Rotates clockwise a grid and returns a list of rotated grids
+
+        :param tuple angles: Which angles to use for rotation
+        :return: The dots
+        """
+
+        rotated_grids = []
+
+        x_vals = set(dot.position.real for dot in self.dots.values())
+        y_vals = set(dot.position.imag for dot in self.dots.values())
+
+        min_x, max_x, min_y, max_y = self.get_box()
+        width, height = self.get_size()
+
+        if isinstance(angles, int):
+            angles = {angles}
+
+        for angle in angles:
+            if angle == 0:
+                rotated_grids.append(self)
+            elif angle == 90:
+                rotated_grids.append(
+                    Grid(
+                        {
+                            height - 1 + pos.imag - 1j * pos.real: dot.terrain
+                            for pos, dot in self.dots.items()
+                        }
+                    )
+                )
+            elif angle == 180:
+                rotated_grids.append(
+                    Grid(
+                        {
+                            width
+                            - 1
+                            - pos.real
+                            - 1j * (height - 1 + pos.imag): dot.terrain
+                            for pos, dot in self.dots.items()
+                        }
+                    )
+                )
+            elif angle == 270:
+                rotated_grids.append(
+                    Grid(
+                        {
+                            -pos.imag - 1j * (width - 1 - pos.real): dot.terrain
+                            for pos, dot in self.dots.items()
+                        }
+                    )
+                )
+
+        return rotated_grids
+
+    def flip(self, flips):
+        """
+        Flips a grid and returns a list of grids
+
+        :param tuple flips: Which flips to perform
+        :return: The dots
+        """
+
+        flipped_grids = []
+
+        x_vals = set(dot.position.real for dot in self.dots.values())
+        y_vals = set(dot.position.imag for dot in self.dots.values())
+
+        min_x, max_x, min_y, max_y = self.get_box()
+        width, height = self.get_size()
+
+        if isinstance(flips, str):
+            flips = {flips}
+
+        for flip in flips:
+            if flip == "N":
+                flipped_grids.append(self)
+            elif flip == "H":
+                flipped_grids.append(
+                    Grid(
+                        {
+                            pos.real - 1j * (height - 1 + pos.imag): dot.terrain
+                            for pos, dot in self.dots.items()
+                        }
+                    )
+                )
+            elif flip == "V":
+                flipped_grids.append(
+                    Grid(
+                        {
+                            width - 1 - pos.real + 1j * pos.imag: dot.terrain
+                            for pos, dot in self.dots.items()
+                        }
+                    )
+                )
+
+        return flipped_grids
+
     def crop(self, corners=[], size=0):
         """
         Gets the list of dots within a given area
@@ -250,20 +383,24 @@ class Grid:
             min_y, max_y = int(min(y_vals)), int(max(y_vals))
 
         if self.is_isotropic:
-            cropped = {
-                x + y * 1j: self.dots[x + y * 1j]
-                for y in range(min_y, max_y + 1)
-                for x in range(min_x, max_x + 1)
-                if x + y * 1j in self.dots
-            }
+            cropped = Grid(
+                {
+                    x + y * 1j: self.dots[x + y * 1j].terrain
+                    for y in range(min_y, max_y + 1)
+                    for x in range(min_x, max_x + 1)
+                    if x + y * 1j in self.dots
+                }
+            )
         else:
-            cropped = {
-                (x + y * 1j, dir): self.dots[(x + y * 1j, dir)]
-                for y in range(min_y, max_y + 1)
-                for x in range(min_x, max_x + 1)
-                for dir in self.all_directions
-                if (x + y * 1j, dir) in self.dots
-            }
+            cropped = Grid(
+                {
+                    (x + y * 1j, dir): self.dots[(x + y * 1j, dir)].terrain
+                    for y in range(min_y, max_y + 1)
+                    for x in range(min_x, max_x + 1)
+                    for dir in self.all_directions
+                    if (x + y * 1j, dir) in self.dots
+                }
+            )
 
         return cropped
 
@@ -333,3 +470,39 @@ class Grid:
         graph.neighbors = lambda vertex: vertex.get_neighbors()
 
         return graph
+
+
+def merge_grids(grids, width, height):
+    """
+    Merges different grids in a single grid
+
+    All grids are assumed to be of the same size
+
+    :param dict grids: The grids to merge
+    :param int width: The width, in number of grids
+    :param int height: The height, in number of grids
+    :return: The merged grid
+    """
+
+    final_grid = Grid()
+
+    part_width, part_height = grids[0].get_size()
+    if any([not grid.is_isotropic for grid in grids]):
+        print("This works only for isotropic grids")
+        return
+
+    grid_nr = 0
+    for part_y in range(height):
+        for part_x in range(width):
+            offset = part_x * part_width - 1j * part_y * part_height
+            final_grid.dots.update(
+                {
+                    (pos + offset): Dot(
+                        final_grid, pos + offset, grids[grid_nr].dots[pos].terrain
+                    )
+                    for pos in grids[grid_nr].dots
+                }
+            )
+            grid_nr += 1
+
+    return final_grid
