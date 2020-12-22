@@ -5,49 +5,57 @@ import pathfinding
 test_data = {}
 
 test = 1
-test_data[test] = {"input": """""",
-                   "expected": ['Unknown', 'Unknown'],
-                  }
+test_data[test] = {
+    "input": """""",
+    "expected": ["Unknown", "Unknown"],
+}
 
 test += 1
-test_data[test] = {"input": """""",
-                   "expected": ['Unknown', 'Unknown'],
-                  }
+test_data[test] = {
+    "input": """""",
+    "expected": ["Unknown", "Unknown"],
+}
 
-test = 'real'
-test_data[test] = {"input": '11112123333',
-                   "expected": ['31', 'Unknown'],
-                  }
+test = "real"
+test_data[test] = {
+    "input": "11112123333",
+    "expected": ["31", "55"],
+}
 
 # -------------------------------- Control program execution -------------------------------- #
 
-case_to_test  = 'real'
-part_to_test  = 2
+case_to_test = "real"
+part_to_test = 2
 verbose_level = 1
 
 # -------------------------------- Initialize some variables -------------------------------- #
 
-puzzle_input           = test_data[case_to_test]['input']
-puzzle_expected_result = test_data[case_to_test]['expected'][part_to_test-1]
-puzzle_actual_result   = 'Unknown'
-
-
+puzzle_input = test_data[case_to_test]["input"]
+puzzle_expected_result = test_data[case_to_test]["expected"][part_to_test - 1]
+puzzle_actual_result = "Unknown"
 
 
 # -------------------------------- Actual code execution -------------------------------- #
 
 
-
 if part_to_test == 1:
     # -------------------------------- Graph-related functions -------------------------------- #
     # Re-implement the heuristic to match this graph
-    def heuristic (self, current_node, target_node):
-      return sum([abs(int(target_node[i]) - int(current_node[i])) for i in range (1, len(current_node))]) // 2
+    def heuristic(self, current_node, target_node):
+        return (
+            sum(
+                [
+                    abs(int(target_node[i]) - int(current_node[i]))
+                    for i in range(1, len(current_node))
+                ]
+            )
+            // 2
+        )
+
     pathfinding.WeightedGraph.heuristic = heuristic
 
-
     # How to determine neighbors
-    def neighbors (self, state):
+    def neighbors(self, state):
         global states
         E = int(state[0])
         movables = [x for x in range(1, len(state)) if state[x] == state[0]]
@@ -56,21 +64,38 @@ if part_to_test == 1:
         possible_neighbors = []
         for movable in movables:
             if E > 1:
-                neighbor = str(E-1) + state[1:movable] + str(int(state[movable])-1) + state[movable+1:]
+                neighbor = (
+                    str(E - 1)
+                    + state[1:movable]
+                    + str(int(state[movable]) - 1)
+                    + state[movable + 1 :]
+                )
                 possible_neighbors.append(neighbor)
             if E < 4:
-                neighbor = str(E+1) + state[1:movable] + str(int(state[movable])+1) + state[movable+1:]
+                neighbor = (
+                    str(E + 1)
+                    + state[1:movable]
+                    + str(int(state[movable]) + 1)
+                    + state[movable + 1 :]
+                )
                 possible_neighbors.append(neighbor)
 
         if len(movables) >= 2:
             for moved_objects in itertools.combinations(movables, 2):
                 mov1, mov2 = moved_objects
                 # No use to bring 2 items downstairs
-    #            if E > 1:
-    #                neighbor = str(E-1) + state[1:mov1] + str(int(state[mov1])-1) + state[mov1+1:mov2] + str(int(state[mov2])-1) + state[mov2+1:]
-    #                possible_neighbors.append(neighbor)
+                #            if E > 1:
+                #                neighbor = str(E-1) + state[1:mov1] + str(int(state[mov1])-1) + state[mov1+1:mov2] + str(int(state[mov2])-1) + state[mov2+1:]
+                #                possible_neighbors.append(neighbor)
                 if E < 4:
-                    neighbor = str(E+1) + state[1:mov1] + str(int(state[mov1])+1) + state[mov1+1:mov2] + str(int(state[mov2])+1) + state[mov2+1:]
+                    neighbor = (
+                        str(E + 1)
+                        + state[1:mov1]
+                        + str(int(state[mov1]) + 1)
+                        + state[mov1 + 1 : mov2]
+                        + str(int(state[mov2]) + 1)
+                        + state[mov2 + 1 :]
+                    )
                     possible_neighbors.append(neighbor)
 
         return [x for x in possible_neighbors if x in states]
@@ -79,8 +104,8 @@ if part_to_test == 1:
 
     def cost(self, current_node, next_node):
         return 1
-    pathfinding.WeightedGraph.cost = cost
 
+    pathfinding.WeightedGraph.cost = cost
 
     # -------------------------------- Graph construction & execution -------------------------------- #
 
@@ -88,27 +113,43 @@ if part_to_test == 1:
     # Forbidden states: Any G + M if G for M is absent
     # Forbidden transitions: E changes, the rest is identical
 
-    states = set([''.join([str(E), str(TG), str(TM), str(PtG), str(PtM), str(SG), str(SM), str(PrG), str(PrM), str(RG), str(RM)])
-              for E in range(1, 5)
-              for TG in range(1, 5)
-              for TM in range(1, 5)
-              for PtG in range(1, 5)
-              for PtM in range(1, 5)
-              for SG in range(1, 5)
-              for SM in range(1, 5)
-              for PrG in range(1, 5)
-              for PrM in range(1, 5)
-              for RG in range(1, 5)
-              for RM in range(1, 5)
+    states = set(
+        [
+            "".join(
+                [
+                    str(E),
+                    str(TG),
+                    str(TM),
+                    str(PtG),
+                    str(PtM),
+                    str(SG),
+                    str(SM),
+                    str(PrG),
+                    str(PrM),
+                    str(RG),
+                    str(RM),
+                ]
+            )
+            for E in range(1, 5)
+            for TG in range(1, 5)
+            for TM in range(1, 5)
+            for PtG in range(1, 5)
+            for PtM in range(1, 5)
+            for SG in range(1, 5)
+            for SM in range(1, 5)
+            for PrG in range(1, 5)
+            for PrM in range(1, 5)
+            for RG in range(1, 5)
+            for RM in range(1, 5)
+            if (TG == TM or TM not in (TG, PtG, SG, PrG, RG))
+            and (PtG == PtM or PtM not in (TG, PtG, SG, PrG, RG))
+            and (SG == SM or SM not in (TG, PtG, SG, PrG, RG))
+            and (PrG == PrM or PrM not in (TG, PtG, SG, PrG, RG))
+            and (RG == RM or RM not in (TG, PtG, SG, PrG, RG))
+        ]
+    )
 
-              if  (TG  == TM  or TM  not in (TG, PtG, SG, PrG, RG))
-              and (PtG == PtM or PtM not in (TG, PtG, SG, PrG, RG))
-              and (SG  == SM  or SM  not in (TG, PtG, SG, PrG, RG))
-              and (PrG == PrM or PrM not in (TG, PtG, SG, PrG, RG))
-              and (RG  == RM  or RM  not in (TG, PtG, SG, PrG, RG))
-           ])
-
-    end = '4' * 11
+    end = "4" * 11
 
     graph = pathfinding.WeightedGraph()
     came_from, total_cost = graph.a_star_search(puzzle_input, end)
@@ -119,13 +160,13 @@ else:
     # -------------------------------- Graph-related functions -------------------------------- #
     # Part 2 was completely rewritten for performance improvements
 
-    def valid_state (state):
-        pairs = [(state[x], state[x+1]) for x in range (1, len(state), 2)]
+    def valid_state(state):
+        pairs = [(state[x], state[x + 1]) for x in range(1, len(state), 2)]
         generators = state[1::2]
 
         for pair in pairs:
-            if pair[0] != pair[1]: # Microchip is not with generator
-                if pair[1] in generators: # Microchip is with a generator
+            if pair[0] != pair[1]:  # Microchip is not with generator
+                if pair[1] in generators:  # Microchip is with a generator
                     return False
 
         return True
@@ -133,7 +174,7 @@ else:
     def visited_state(state):
         global visited_coded_states
 
-        pairs = [(state[x], state[x+1]) for x in range (1, len(state), 2)]
+        pairs = [(state[x], state[x + 1]) for x in range(1, len(state), 2)]
 
         coded_state = [(state[0], pair) for pair in sorted(pairs)]
 
@@ -142,7 +183,6 @@ else:
         else:
             visited_coded_states.append(coded_state)
             return False
-
 
     # -------------------------------- BFS implementation -------------------------------- #
     start = list(map(int, puzzle_input)) + [1] * 4
@@ -157,9 +197,13 @@ else:
         # Determine potential states to go to
         elev_position = state[0]
         # The +1 ignores the elevator
-        elements_at_level = [item+1 for item, level in enumerate(state[1:]) if level == elev_position]
+        elements_at_level = [
+            item + 1 for item, level in enumerate(state[1:]) if level == elev_position
+        ]
 
-        movables = list(itertools.combinations(elements_at_level, 2)) + elements_at_level
+        movables = (
+            list(itertools.combinations(elements_at_level, 2)) + elements_at_level
+        )
 
         if elev_position == 1:
             directions = [1]
@@ -175,7 +219,7 @@ else:
                 new_floor = elev_position + direction
                 new_state[0] = new_floor
                 if isinstance(movable, tuple):
-                # No point in moving 2 items downwards
+                    # No point in moving 2 items downwards
                     if direction == -1:
                         continue
                     new_state[movable[0]] = new_floor
@@ -187,39 +231,24 @@ else:
                     if visited_state(new_state):
                         continue
                     else:
-                        frontier.append((new_state, curr_steps+1))
+                        frontier.append((new_state, curr_steps + 1))
 
                 if new_state == end:
                     puzzle_actual_result = curr_steps + 1
                     break
 
-            if puzzle_actual_result != 'Unknown':
+            if puzzle_actual_result != "Unknown":
                 break
 
-        if puzzle_actual_result != 'Unknown':
+        if puzzle_actual_result != "Unknown":
             break
 
-
-
-
-
-
-
     puzzle_actual_result = curr_steps + 1
-
-
-
-
-
 
 
 # -------------------------------- Outputs / results -------------------------------- #
 
 if verbose_level >= 3:
-    print ('Input : ' + puzzle_input)
-print ('Expected result : ' + str(puzzle_expected_result))
-print ('Actual result   : ' + str(puzzle_actual_result))
-
-
-
-
+    print("Input : " + puzzle_input)
+print("Expected result : " + str(puzzle_expected_result))
+print("Actual result   : " + str(puzzle_actual_result))

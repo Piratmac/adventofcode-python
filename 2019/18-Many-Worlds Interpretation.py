@@ -104,7 +104,7 @@ input_file = os.path.join(
 )
 test_data[test] = {
     "input": open(input_file, "r+").read().strip(),
-    "expected": ["4844", "Unknown"],
+    "expected": ["4844", "1784"],
 }
 
 # -------------------------------- Control program execution ------------------------- #

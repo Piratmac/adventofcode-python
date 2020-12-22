@@ -93,7 +93,7 @@ for i in range(2 * 10 ** 4):
             for x, y, vx, vy in stars_init
         ]
         star_map.vertices = vertices
-        puzzle_actual_result = min_i_galaxy_size
+        puzzle_actual_result = "See above, the galaxy is of size", min_i_galaxy_size
         print(star_map.vertices_to_grid(wall=" "))
         break
 
