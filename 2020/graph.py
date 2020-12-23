@@ -196,6 +196,9 @@ class Graph:
             vertex, current_distance = frontier.pop(0)
             current_distance += 1
             neighbors = self.neighbors(vertex)
+            # This allows to cover WeightedGraphs
+            if isinstance(neighbors, dict):
+                neighbors = list(neighbors.keys())
             if not neighbors:
                 continue
 
@@ -212,8 +215,6 @@ class Graph:
                 if neighbor == end:
                     return True
 
-        if end:
-            return True
         return False
 
     def greedy_best_first_search(self, start, end):
@@ -444,3 +445,64 @@ class WeightedGraph(Graph):
                     raise NegativeWeightCycle
 
         return end is None or end in self.distance_from_start
+
+    def ford_fulkerson(self, start, end):
+        """
+        Searches for the maximum flow using the Ford-Fulkerson algorithm
+
+        The weights of the graph are used as flow limitations
+        Note: there may be multiple options, this generates only one
+
+        :param Any start: The start vertex to consider
+        :param Any end: The target/end vertex to consider
+        :return: True when the end vertex is found, False otherwise
+        """
+
+        if start not in vertices:
+            return ValueError("Source not in graph")
+        if end not in vertices:
+            return ValueError("End not in graph")
+
+        if end not in self.edges:
+            self.edges[end] = {}
+
+        initial_edges = {a: graph.edges[a].copy() for a in graph.edges}
+        self.flow_graph = {a: graph.edges[a].copy() for a in graph.edges}
+
+        max_flow = 0
+        frontier = [start]
+        heapq.heapify(frontier)
+        print(self.edges)
+
+        while self.breadth_first_search(start, end):
+            path_flow = float("Inf")
+            cursor = end
+            while cursor != start:
+                path_flow = min(path_flow, self.edges[self.came_from[cursor]][cursor])
+                cursor = self.came_from[cursor]
+
+            max_flow += path_flow
+
+            # Update the graph to change the flows
+            cursor = end
+            while cursor != start:
+                self.edges[self.came_from[cursor]][cursor] -= path_flow
+                if self.edges[self.came_from[cursor]][cursor] == 0:
+                    del self.edges[self.came_from[cursor]][cursor]
+                self.edges[cursor][self.came_from[cursor]] = (
+                    self.edges[cursor].get(self.came_from[cursor], 0) + path_flow
+                )
+
+                cursor = self.came_from[cursor]
+
+        cursor = end
+        for vertex in self.vertices:
+            for neighbor, items in self.neighbors(vertex).items():
+                if neighbor in self.flow_graph[vertex]:
+                    self.flow_graph[vertex][neighbor] -= self.edges[vertex][neighbor]
+                    if self.flow_graph[vertex][neighbor] == 0:
+                        del self.flow_graph[vertex][neighbor]
+
+        self.edges = initial_edges
+
+        return max_flow
