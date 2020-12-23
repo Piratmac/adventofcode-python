@@ -151,3 +151,5 @@ print("Case :", case_to_test, "- Part", part_to_test)
 print("Expected result : " + str(puzzle_expected_result))
 print("Actual result   : " + str(puzzle_actual_result))
 # Date created: 2020-12-23 06:25:17.546310
+# Part 1: 2020-12-23 06:36:18
+# Part 2: 2020-12-23 15:21:48
