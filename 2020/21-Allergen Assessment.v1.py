@@ -41,15 +41,6 @@ sqjhc mxmxvkd sbzzf (contains fish)""",
     "expected": ["5", "mxmxvkd,sqjhc,fvjkl"],
 }
 
-test += 1
-test_data[test] = {
-    "input": """mxmxvkd kfcds sqjhc nhms (contains dairy, fish)
-trh fvjkl sbzzf mxmxvkd (contains dairy)
-sqjhc fvjkl (contains soy)
-sqjhc mxmxvkd sbzzf (contains fish)""",
-    "expected": ["5", "mxmxvkd,sqjhc,fvjkl"],
-}
-
 test = "real"
 input_file = os.path.join(
     os.path.dirname(__file__),
@@ -76,49 +67,88 @@ puzzle_actual_result = "Unknown"
 
 # -------------------------------- Actual code execution ----------------------------- #
 
-all_allergens = set()
-all_ingredients = {}
-allergen_graph = graph.WeightedGraph()
-allergen_graph.vertices = set()
+all_ingredients = defaultdict(int)
+all_allergens = {}
+nb_allergens = defaultdict(int)
+allergens_ingredients = {}
 
 for string in puzzle_input.split("\n"):
     if "contains" in string:
         ingredients = string.split(" (")[0].split(" ")
         allergens = string.split("(contains ")[1][:-1].split(", ")
-
-        all_allergens = all_allergens.union(allergens)
-        all_ingredients.update(
-            {ing: all_ingredients.get(ing, 0) + 1 for ing in ingredients}
-        )
+        if isinstance(allergens, str):
+            allergens = [allergens]
 
         for allergen in allergens:
-            if allergen not in allergen_graph.edges:
-                allergen_graph.edges[allergen] = {x: 1 for x in ingredients}
+            nb_allergens[allergen] += 1
+            if allergen not in all_allergens:
+                all_allergens[allergen] = ingredients.copy()
+                allergens_ingredients[allergen] = defaultdict(int)
+                allergens_ingredients[allergen].update(
+                    {ingredient: 1 for ingredient in ingredients}
+                )
+
             else:
-                for ing in allergen_graph.edges[allergen].copy():
-                    if ing not in ingredients:
-                        del allergen_graph.edges[allergen][ing]
+                for ingredient in ingredients:
+                    allergens_ingredients[allergen][ingredient] += 1
+                for ingredient in all_allergens[allergen].copy():
+                    if ingredient not in ingredients:
+                        all_allergens[allergen].remove(ingredient)
+
+        for ingredient in ingredients:
+            all_ingredients[ingredient] += 1
 
     else:
         print("does not contain any allergen")
 
-allergen_graph.vertices = list(all_allergens.union(set(all_ingredients.keys())))
-allergen_graph.bipartite_matching(all_allergens, all_ingredients)
+
+for allergen in test:
+    if allergen != "shellfish":
+        continue
+    print(
+        allergen,
+        test2[allergen],
+        [ing for ing, val in test[allergen].items() if val == test2[allergen]],
+    )
+
+sum_ingredients = 0
+for ingredient in all_ingredients:
+    if not (any(ingredient in val for val in all_allergens.values())):
+        sum_ingredients += all_ingredients[ingredient]
 
 if part_to_test == 1:
-    safe_ingredients = [
-        x for x in allergen_graph.vertices if allergen_graph.flow_graph[x] == {}
-    ]
-    safe_number = sum(all_ingredients[x] for x in safe_ingredients)
-    puzzle_actual_result = safe_number
+    puzzle_actual_result = sum_ingredients
+
 
 else:
-    dangerous_ingredients = [
-        list(allergen_graph.flow_graph[aller].keys())[0]
-        for aller in sorted(all_allergens)
-    ]
-    puzzle_actual_result = ",".join(dangerous_ingredients)
+    allergens_ingredients = {
+        aller: [
+            ing
+            for ing, val in allergens_ingredients[aller].items()
+            if val == nb_allergens[aller]
+        ]
+        for aller in nb_allergens
+    }
+    final_allergen = {}
+    while len(final_allergen) != len(nb_allergens):
+        for allergen, val in allergens_ingredients.items():
+            if len(val) == 1:
+                final_allergen[allergen] = val[0]
 
+        allergens_ingredients = {
+            aller: [
+                ing
+                for ing in allergens_ingredients[aller]
+                if ing not in final_allergen.values()
+            ]
+            for aller in nb_allergens
+        }
+
+    print(final_allergen)
+    ing_list = ""
+    for aller in sorted(final_allergen.keys()):
+        ing_list += final_allergen[aller] + ","
+    puzzle_actual_result = ing_list[:-1]
 
 # -------------------------------- Outputs / results --------------------------------- #
 
