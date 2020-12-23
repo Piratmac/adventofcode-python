@@ -90,38 +90,6 @@ puzzle_actual_result = "Unknown"
 
 
 # -------------------------------- Actual code execution ----------------------------- #
-def find_winner(cards, recursive):
-    previous_decks = []
-
-    while cards[0] and cards[1]:
-        # #print ('before', cards)
-        if cards in previous_decks:
-            return (0, None)
-        previous_decks.append([cards[i].copy() for i in (0, 1)])
-
-        cards_played = [cards[i].pop(0) for i in (0, 1)]
-
-        if (
-            recursive
-            and cards_played[0] <= len(cards[0])
-            and cards_played[1] <= len(cards[1])
-        ):
-            # #print ('subgame')
-            winner, _ = find_winner([cards[i][: cards_played[i]] for i in (0, 1)], True)
-            # #print ('subgame won by', winner)
-
-        else:
-            winner = cards_played[0] < cards_played[1]
-
-        cards[winner].append(cards_played[winner])
-        cards[winner].append(cards_played[1 - winner])
-
-    winner = [i for i in (0, 1) if cards[i] != []][0]
-
-    score = sum(card * (len(cards[winner]) - i) for i, card in enumerate(cards[winner]))
-
-    return (winner, score)
-
 
 if part_to_test == 1:
     players = puzzle_input.split("\n\n")
@@ -129,16 +97,64 @@ if part_to_test == 1:
     cards[0].pop(0)
     cards[1].pop(0)
 
-    puzzle_actual_result = find_winner(cards, False)[1]
+    while len(cards[0]) != 0 and len(cards[1]) != 0:
+        if cards[0][0] >= cards[1][0]:
+            cards[0].append(cards[0].pop(0))
+            cards[0].append(cards[1].pop(0))
+        else:
+            cards[1].append(cards[1].pop(0))
+            cards[1].append(cards[0].pop(0))
+
+    winner = cards[0] + cards[1]
+
+    score = sum([card * (len(winner) - i) for i, card in enumerate(winner)])
+
+    puzzle_actual_result = score
 
 
 else:
+
+    def find_winner(cards):
+        previous_decks = []
+
+        while len(cards[0]) != 0 and len(cards[1]) != 0:
+            # #print ('before', cards)
+            if cards in previous_decks:
+                return (0, 0)
+            previous_decks.append(copy.deepcopy(cards))
+
+            if cards[0][0] < len(cards[0]) and cards[1][0] < len(cards[1]):
+                # #print ('subgame')
+                winner, score = find_winner(
+                    [cards[0][1 : cards[0][0] + 1], cards[1][1 : cards[1][0] + 1]]
+                )
+                # #print ('subgame won by', winner)
+                cards[winner].append(cards[winner].pop(0))
+                cards[winner].append(cards[1 - winner].pop(0))
+
+            elif cards[0][0] >= cards[1][0]:
+                cards[0].append(cards[0].pop(0))
+                cards[0].append(cards[1].pop(0))
+            else:
+                cards[1].append(cards[1].pop(0))
+                cards[1].append(cards[0].pop(0))
+
+        winner = [i for i in (0, 1) if cards[i] != []][0]
+
+        score = sum(
+            [card * (len(cards[winner]) - i) for i, card in enumerate(cards[winner])]
+        )
+
+        return (winner, score)
+
     players = puzzle_input.split("\n\n")
     cards = [ints(player) for i, player in enumerate(players)]
     cards[0].pop(0)
     cards[1].pop(0)
 
-    puzzle_actual_result = find_winner(cards, True)[1]
+    # #print (find_winner(cards))
+
+    puzzle_actual_result = find_winner(cards)[1]
 
 
 # -------------------------------- Outputs / results --------------------------------- #
