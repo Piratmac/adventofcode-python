@@ -455,24 +455,23 @@ class WeightedGraph(Graph):
 
         :param Any start: The start vertex to consider
         :param Any end: The target/end vertex to consider
-        :return: True when the end vertex is found, False otherwise
+        :return: The maximum flow
         """
 
-        if start not in vertices:
-            return ValueError("Source not in graph")
-        if end not in vertices:
-            return ValueError("End not in graph")
+        if start not in self.vertices:
+            raise ValueError("Source not in graph")
+        if end not in self.vertices:
+            raise ValueError("End not in graph")
 
         if end not in self.edges:
             self.edges[end] = {}
 
-        initial_edges = {a: graph.edges[a].copy() for a in graph.edges}
-        self.flow_graph = {a: graph.edges[a].copy() for a in graph.edges}
+        initial_edges = {a: self.edges[a].copy() for a in self.edges}
+        self.flow_graph = {a: self.edges[a].copy() for a in self.edges}
 
         max_flow = 0
         frontier = [start]
         heapq.heapify(frontier)
-        print(self.edges)
 
         while self.breadth_first_search(start, end):
             path_flow = float("Inf")
@@ -506,3 +505,38 @@ class WeightedGraph(Graph):
         self.edges = initial_edges
 
         return max_flow
+
+    def bipartite_matching(self, starts, ends):
+        """
+        Performs a bipartite matching using Fold-Fulkerson's algorithm
+
+        :param iterable starts: A list of source vertices
+        :param iterable ends: A list of target vertices
+        :return: The maximum matches found
+        """
+
+        start_point = "A"
+        while start_point in self.vertices:
+            start_point += "A"
+        self.edges[start_point] = {}
+        self.vertices += start_point
+        for start in starts:
+            if start not in self.vertices:
+                return ValueError("Source not in graph")
+            self.edges[start_point].update({start: 1})
+
+        end_point = "Z"
+        while end_point in self.vertices:
+            end_point += "Z"
+        self.vertices.append(end_point)
+        for end in ends:
+            if end not in self.vertices:
+                return ValueError("End not in graph")
+            if end not in self.edges:
+                self.edges[end] = {}
+            self.edges[end].update({end_point: 1})
+
+        value = self.ford_fulkerson(start_point, end_point)
+        self.vertices.remove(end_point)
+        self.vertices.remove(start_point)
+        return value
