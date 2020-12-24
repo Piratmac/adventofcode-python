@@ -33,3 +33,24 @@ relative_directions = {
     "ahead": 1,
     "back": -1,
 }
+
+
+class hexcompass:
+    west = -1
+    east = 1
+    northeast = 0.5 + 1j
+    northwest = -0.5 + 1j
+    southeast = 0.5 - 1j
+    southwest = -0.5 - 1j
+
+    all_directions = [northwest, southwest, west, northeast, southeast, east]
+
+    text_to_direction = {
+        "E": east,
+        "W": west,
+        "NW": northwest,
+        "NE": northeast,
+        "SE": southeast,
+        "SW": southwest,
+    }
+    direction_to_text = {text_to_direction[x]: x for x in text_to_direction}
