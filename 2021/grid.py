@@ -105,6 +105,33 @@ class Grid:
                             )
             y += 1
 
+    def words_to_dots(self, text, convert_to_int=False):
+        """
+        Converts a text to a set of dots
+
+        The text is expected to be separated by newline characters
+        The dots will have x - y * 1j as coordinates
+        Dots are words (rather than letters, like in text_to_dots)
+
+        :param string text: The text to convert
+        :param sequence ignore_terrain: Types of terrain to ignore (useful for walls)
+        """
+        self.dots = {}
+
+        y = 0
+        for line in text.splitlines():
+            for x in line.split(" "):
+                for dir in self.possible_source_directions.get(
+                    x, self.direction_default
+                ):
+                    if convert_to_int:
+                        self.dots[(x - y * 1j, dir)] = Dot(
+                            self, x - y * 1j, int(x), dir
+                        )
+                    else:
+                        self.dots[(x - y * 1j, dir)] = Dot(self, x - y * 1j, x, dir)
+            y += 1
+
     def dots_to_text(self, mark_coords={}, void=" "):
         """
         Converts dots to a text
@@ -212,7 +239,7 @@ class Grid:
         This will be returned in left-to-right, up to bottom reading order
         Newline characters are not included
 
-        :return: a set of coordinates
+        :return: a text representing a border
         """
 
         if not self.dots:
@@ -238,6 +265,48 @@ class Grid:
             )
 
         return borders_text
+
+    def get_columns(self):
+        """
+        Gets the columns of the image
+
+        :return: a dict of dots
+        """
+
+        if not self.dots:
+            return (0, 0, 0, 0)
+        x_vals = set(map(int, (dot.position.real for dot in self.dots.values())))
+        y_vals = set(map(int, (dot.position.imag for dot in self.dots.values())))
+
+        min_x, max_x = int(min(x_vals)), int(max(x_vals))
+        min_y, max_y = int(min(y_vals)), int(max(y_vals))
+
+        columns = {}
+        for x in x_vals:
+            columns[x] = [x + 1j * y for y in y_vals if x + 1j * y in self.dots]
+
+        return columns
+
+    def get_rows(self):
+        """
+        Gets the rows of the image
+
+        :return: a dict of dots
+        """
+
+        if not self.dots:
+            return (0, 0, 0, 0)
+        x_vals = set(map(int, (dot.position.real for dot in self.dots.values())))
+        y_vals = set(map(int, (dot.position.imag for dot in self.dots.values())))
+
+        min_x, max_x = int(min(x_vals)), int(max(x_vals))
+        min_y, max_y = int(min(y_vals)), int(max(y_vals))
+
+        rows = {}
+        for y in y_vals:
+            rows[y] = [x + 1j * y for x in x_vals if x + 1j * y in self.dots]
+
+        return rows
 
     def rotate(self, angles):
         """
