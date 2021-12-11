@@ -78,7 +78,7 @@ class Grid:
             for dot in self.dots.values():
                 dot.neighbors_obsolete = True
 
-    def text_to_dots(self, text, ignore_terrain=""):
+    def text_to_dots(self, text, ignore_terrain="", convert_to_int=False):
         """
         Converts a text to a set of dots
 
@@ -94,14 +94,18 @@ class Grid:
         for line in text.splitlines():
             for x in range(len(line)):
                 if line[x] not in ignore_terrain:
+                    if convert_to_int:
+                        value = int(line[x])
+                    else:
+                        value = line[x]
                     if self.is_isotropic:
-                        self.dots[x - y * 1j] = Dot(self, x - y * 1j, line[x])
+                        self.dots[x - y * 1j] = Dot(self, x - y * 1j, value)
                     else:
                         for dir in self.possible_source_directions.get(
-                            line[x], self.direction_default
+                            value, self.direction_default
                         ):
                             self.dots[(x - y * 1j, dir)] = Dot(
-                                self, x - y * 1j, line[x], dir
+                                self, x - y * 1j, value, dir
                             )
             y += 1
 
@@ -150,7 +154,7 @@ class Grid:
         for y in range(max_y, min_y - 1, -1):
             for x in range(min_x, max_x + 1):
                 try:
-                    text += mark_coords[x + y * 1j]
+                    text += str(mark_coords[x + y * 1j])
                 except (KeyError, TypeError):
                     if x + y * 1j in mark_coords:
                         text += "X"

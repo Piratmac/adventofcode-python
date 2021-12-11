@@ -129,17 +129,17 @@ class Dot:
 
     def __repr__(self):
         if self.grid.is_isotropic:
-            return self.terrain + "@" + complex(self.position).__str__()
+            return str(self.terrain) + "@" + complex(self.position).__str__()
         else:
             return (
-                self.terrain
+                str(self.terrain)
                 + "@"
                 + complex(self.position).__str__()
                 + direction_to_text[self.source_direction]
             )
 
     def __str__(self):
-        return self.terrain
+        return str(self.terrain)
 
     def __add__(self, direction):
         if not direction in self.allowed_directions:
