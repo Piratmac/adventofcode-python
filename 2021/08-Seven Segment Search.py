@@ -64,7 +64,7 @@ input_file = os.path.join(
 )
 test_data[test] = {
     "input": open(input_file, "r+").read(),
-    "expected": ["Unknown", "Unknown"],
+    "expected": ["543", "994266"],
 }
 
 
