@@ -107,6 +107,64 @@ class Graph:
             if neighbor == end:
                 raise TargetFound
 
+    def find_all_paths(self, start, end=None):
+        """
+        Searches for all possible paths
+
+        To avoid loops, function is_vertex_valid_for_path must be set
+
+        :param Any start: The start vertex to consider
+        :param Any end: The target/end vertex to consider
+        :return: A list of paths
+        """
+        self.paths = []
+
+        return self.dfs_all_paths([start], start, end)
+
+    def is_vertex_valid_for_path(self, path, vertex):
+        """
+        Determines whether a vertex can be added to a path
+
+        The goal is to avoid loops
+
+        :param Any path: The current path
+        :param Any vertex: The vertex to be added to the path
+        :return: True if the vertex can be added
+        """
+        return False
+
+    def dfs_all_paths(self, path, vertex, end=None):
+        """
+        Recurrence function for depth-first search
+
+        This function will be called each time additional depth is needed
+        The recursion stack corresponds to the exploration path
+
+        :param integer current_distance: The distance from start of the current vertex
+        :param Any vertex: The vertex being explored
+        :param Any end: The target/end vertex to consider
+        :return: nothing
+        """
+
+        neighbors = self.neighbors(vertex)
+        if not neighbors:
+            return
+
+        for neighbor in neighbors:
+            if not self.is_vertex_valid_for_path(path, neighbor):
+                continue
+
+            new_path = path.copy()
+
+            # Adding to path
+            new_path.append(neighbor)
+
+            # Examine the neighbor immediatly
+            self.dfs_all_paths(new_path, neighbor, end)
+
+            if neighbor == end:
+                self.paths.append(new_path)
+
     def topological_sort(self):
         """
         Performs a topological sort
