@@ -121,7 +121,7 @@ pair_count = defaultdict(int)
 for i in range(len(source) - 1):
     pair_count[source[i : i + 2]] += 1
 
-print(elem_count, pair_count)
+# print(elem_count, pair_count)
 
 for j in range(nb_counts):
     for pair, nb_pair in pair_count.copy().items():

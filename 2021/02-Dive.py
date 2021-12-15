@@ -95,7 +95,7 @@ else:
             position += int(delta)
             position += int(delta) * abs(aim.imag) * 1j
 
-        print(string, aim, position)
+        # print(string, aim, position)
 
     puzzle_actual_result = int(abs(position.imag) * abs(position.real))
 

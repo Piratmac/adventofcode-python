@@ -92,7 +92,7 @@ for day in range(nb_gen + 1):
     new_fish_plus_2 = new_fish_plus_1.copy()
     new_fish_plus_1 = new_fish.copy()
 
-    print("End of day", day, ":", sum(fishes.values()) + sum(new_fish_plus_2.values()))
+    # print("End of day", day, ":", sum(fishes.values()) + sum(new_fish_plus_2.values()))
 
     puzzle_actual_result = sum(fishes.values()) + sum(new_fish_plus_2.values())
 
