@@ -387,9 +387,7 @@ class WeightedGraph(Graph):
 
                 # Adding for future examination
                 if type(neighbor) == complex:
-                    heapq.heappush(
-                        frontier, (current_distance + weight, SuperComplex(neighbor))
-                    )
+                    heapq.heappush(frontier, (current_distance + weight, neighbor))
                 else:
                     heapq.heappush(frontier, (current_distance + weight, neighbor))
 
