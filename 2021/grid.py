@@ -255,20 +255,16 @@ class Grid:
         min_y, max_y = int(min(y_vals)), int(max(y_vals))
 
         borders = []
-        borders.append([x + 1j * max_y for x in sorted(x_vals)])
-        borders.append([max_x + 1j * y for y in sorted(y_vals)])
-        borders.append([x + 1j * min_y for x in sorted(x_vals)])
-        borders.append([min_x + 1j * y for y in sorted(y_vals)])
+        borders.append([self.dots[x + 1j * max_y] for x in sorted(x_vals)])
+        borders.append([self.dots[max_x + 1j * y] for y in sorted(y_vals)])
+        borders.append([self.dots[x + 1j * min_y] for x in sorted(x_vals)])
+        borders.append([self.dots[min_x + 1j * y] for y in sorted(y_vals)])
 
         borders_text = []
         for border in borders:
-            borders_text.append(
-                Grid({pos: self.dots[pos].terrain for pos in border})
-                .dots_to_text()
-                .replace("\n", "")
-            )
+            borders_text.append("".join(dot.terrain for dot in border))
 
-        return borders_text
+        return borders, borders_text
 
     def get_columns(self):
         """

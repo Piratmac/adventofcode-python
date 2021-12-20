@@ -171,7 +171,7 @@ class Dot:
     def set_terrain(self, terrain):
         self.terrain = terrain or self.terrain_default
         self.is_walkable, self.is_waypoint = self.terrain_map.get(
-            terrain, self.terrain_map[self.terrain_default]
+            self.terrain, self.terrain_map[self.terrain_default]
         )
 
     def set_directions(self):
