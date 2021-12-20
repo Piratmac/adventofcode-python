@@ -65,86 +65,67 @@ puzzle_actual_result = "Unknown"
 
 
 # -------------------------------- Actual code execution ----------------------------- #
-
+string = puzzle_input.split("\n")[0]
 
 if part_to_test == 1:
     moves = 100
-    for string in puzzle_input.split("\n"):
-        cups = [int(x) for x in string]
-
-    for i in range(moves):
-        cur_cup = cups[0]
-        pickup = cups[1:4]
-        del cups[0:4]
-
-        try:
-            dest_cup = max([x for x in cups if x < cur_cup])
-        except:
-            dest_cup = max([x for x in cups])
-        cups[cups.index(dest_cup) + 1 : cups.index(dest_cup) + 1] = pickup
-        cups.append(cur_cup)
-
-        print(cups)
-
-    pos1 = cups.index(1)
-    puzzle_actual_result = "".join(map(str, cups[pos1 + 1 :] + cups[:pos1]))
+    nb_cups = 9
+    next_cup = int(string[0])
 
 else:
     moves = 10 ** 7
     nb_cups = 10 ** 6
+    next_cup = 10
 
-    class Cup:
-        def __init__(self, val, next_cup=None):
-            self.val = val
-            self.next_cup = next_cup
 
-    string = puzzle_input.split("\n")[0]
-    next_cup = None
-    cups = {}
-    for x in string[::-1]:
-        cups[x] = Cup(x, next_cup)
-        next_cup = cups[x]
+cups = {}
+for x in string[::-1]:
+    cups[int(x)] = next_cup
+    next_cup = int(x)
 
-    next_cup = cups[string[0]]
+if part_to_test == 2:
+    next_cup = int(string[0])
     for x in range(nb_cups, 9, -1):
-        cups[str(x)] = Cup(str(x), next_cup)
-        next_cup = cups[str(x)]
+        cups[x] = next_cup
+        next_cup = x
 
-    cups[string[-1]].next_cup = cups["10"]
+cur_cup = int(string[0])
+for i in range(moves):
+    # print ('----- Move', i+1)
+    # print ('Current', cur_cup)
 
-    cur_cup = cups[string[0]]
-    for i in range(1, moves + 1):
-        # #print ('----- Move', i)
-        # #print ('Current', cur_cup.val)
+    cups_moved = [
+        cups[cur_cup],
+        cups[cups[cur_cup]],
+        cups[cups[cups[cur_cup]]],
+    ]
+    # print ('Moved cups', cups_moved)
 
-        cups_moved = [
-            cur_cup.next_cup,
-            cur_cup.next_cup.next_cup,
-            cur_cup.next_cup.next_cup.next_cup,
-        ]
-        cups_moved_val = [cup.val for cup in cups_moved]
-        # #print ('Moved cups', cups_moved_val)
+    cups[cur_cup] = cups[cups_moved[-1]]
 
-        cur_cup.next_cup = cups_moved[-1].next_cup
+    dest_cup = cur_cup - 1
+    while dest_cup in cups_moved or dest_cup <= 0:
+        dest_cup -= 1
+        if dest_cup <= 0:
+            dest_cup = nb_cups
 
-        dest_cup_nr = int(cur_cup.val) - 1
-        while str(dest_cup_nr) in cups_moved_val or dest_cup_nr <= 0:
-            dest_cup_nr -= 1
-            if dest_cup_nr <= 0:
-                dest_cup_nr = nb_cups
-        dest_cup = cups[str(dest_cup_nr)]
+    # print ("Destination", dest_cup)
 
-        # #print ("Destination", dest_cup_nr)
+    cups[cups_moved[-1]] = cups[dest_cup]
+    cups[dest_cup] = cups_moved[0]
 
-        cups_moved[-1].next_cup = dest_cup.next_cup
-        dest_cup.next_cup = cups_moved[0]
+    cur_cup = cups[cur_cup]
 
-        cur_cup = cur_cup.next_cup
+if part_to_test == 1:
+    text = ""
+    cup = cups[1]
+    while cup != 1:
+        text += str(cup)
+        cup = cups[cup]
 
-    puzzle_actual_result = int(cups["1"].next_cup.val) * int(
-        cups["1"].next_cup.next_cup.val
-    )
-    # #puzzle_actual_result = cups[(pos1+1)%len(cups)] * cups[(pos1+2)%len(cups)]
+    puzzle_actual_result = text
+else:
+    puzzle_actual_result = cups[1] * cups[cups[1]]
 
 # -------------------------------- Outputs / results --------------------------------- #
 
