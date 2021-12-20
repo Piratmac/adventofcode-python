@@ -3,7 +3,8 @@ import os, grid, graph, dot, assembly, re, itertools
 from collections import Counter, deque, defaultdict
 
 from compass import *
-from simply_linked_list import *
+
+# from simply_linked_list import *
 
 
 # This functions come from https://github.com/mcpower/adventofcode - Thanks!
