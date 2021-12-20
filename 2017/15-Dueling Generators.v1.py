@@ -42,21 +42,19 @@ value = {"A": 0, "B": 0}
 
 
 def gen_a():
-    x = value["A"]
     while True:
-        x *= 16807
-        x %= 2147483647
-        if x % 4 == 0:
-            yield x
+        value["A"] *= factors["A"]
+        value["A"] %= divisor
+        if value["A"] % 4 == 0:
+            yield value["A"]
 
 
 def gen_b():
-    x = value["B"]
     while True:
-        x *= 48271
-        x %= 2147483647
-        if x % 8 == 0:
-            yield x
+        value["B"] *= factors["B"]
+        value["B"] %= divisor
+        if value["B"] % 8 == 0:
+            yield value["B"]
 
 
 if part_to_test == 1:
@@ -83,7 +81,7 @@ else:
     B = gen_b()
     for count_pairs in range(5 * 10 ** 6):
         a, b = next(A), next(B)
-        if a & 0xFFFF == b & 0xFFFF:
+        if "{0:b}".format(a)[-16:] == "{0:b}".format(b)[-16:]:
             nb_matches += 1
 
     puzzle_actual_result = nb_matches
