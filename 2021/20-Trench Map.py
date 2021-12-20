@@ -70,100 +70,39 @@ puzzle_actual_result = "Unknown"
 
 # -------------------------------- Actual code execution ----------------------------- #
 
-dot.Dot.all_directions = directions_diagonals
 all_directions = directions_diagonals
-dot.Dot.allowed_direction_map = {
-    ".": {dir: all_directions for dir in all_directions},
-    "#": {dir: all_directions for dir in all_directions},
-}
-dot.Dot.terrain_map = {
-    ".": [True, False],
-    "#": [True, False],
-    "X": [True, False],
-}
 
-
-def get_neighbors(self):
-    if self.neighbors_obsolete:
-        self.neighbors = {}
-        for direction in self.allowed_directions:
-            if (self + direction) and (self + direction).is_walkable:
-                self.neighbors[self + direction] = 1
-            else:
-                new_dot = self.__class__(self.grid, self.position + direction, ".")
-                self.grid.dots[self.position + direction] = new_dot
-                self.neighbors[self + direction] = 1
-
-    self.neighbors_obsolete = False
-    return self.neighbors
-
-
-dot.Dot.get_neighbors = get_neighbors
-
-grid.Grid.all_directions = directions_diagonals
-
-dot.Dot.sort_value = dot.Dot.sorting_map["reading"]
 
 if part_to_test == 1:
     generations = 2
 else:
     generations = 50
 
-
+# Parsing algorithm
 algorithm = puzzle_input.split("\n")[0]
 
-image = grid.Grid()
-image.all_directions = directions_diagonals
+rules = {}
+for i in range(2 ** 9):
+    binary = "{0:>09b}".format(i)
+    text = binary.replace("0", ".").replace("1", "#")
+    rules[text] = algorithm[i]
+
+image = grid.GameOfLife(True)
+image.set_rules(rules)
 image.text_to_dots("\n".join(puzzle_input.split("\n")[2:]))
 
-# print (image.dots_to_text())
-
-for i in range(generations + 5):
-    dots = image.dots.copy()
-    [image.dots[x].get_neighbors() for x in dots]
-
+# Add some margin to make it 'infinite'
+image.extend_grid(2)
 
 for i in range(generations):
-    # print ('Generation', i)
-    new_image = grid.Grid()
-    new_image.dots = {
-        x: dot.Dot(new_image, image.dots[x].position, image.dots[x].terrain)
-        for x in image.dots
-    }
-    new_image.all_directions = directions_diagonals
-
-    for x in image.dots.copy():
-        neighbors = [neighbor for neighbor in image.dots[x].get_neighbors()] + [
-            image.dots[x]
-        ]
-        text = "".join([neighbor.terrain for neighbor in sorted(neighbors)])
-        binary = int(text.replace(".", "0").replace("#", "1"), 2)
-        new_image.dots[x].set_terrain(algorithm[binary])
-    # print (new_image.dots_to_text())
-
-    # Empty borders so they're not counted later
-    # They use surrounding data (out of image) that default to . and this messes up the rest
-    # This is done only for odd generations because that's enough (all non-borders get blanked out due to the "." at the end of the algorithm)
+    image.evolve(1)
     if i % 2 == 1:
-        borders, _ = new_image.get_borders()
-        borders = functools.reduce(lambda a, b: a + b, borders)
-        [dot.set_terrain(".") for dot in borders]
+        image.reduce_grid(2)
+        image.extend_grid(2)
 
-    image.dots = {
-        x: dot.Dot(image, new_image.dots[x].position, new_image.dots[x].terrain)
-        for x in new_image.dots
-    }
+image.reduce_grid(2)
 
-    # print ('Lit dots', sum([1 for dot in image.dots if image.dots[dot].terrain == '#']))
-
-# Remove the borders that were added (they shouldn't count because they take into account elements outside the image)
-borders, _ = image.get_borders()
-borders = functools.reduce(lambda a, b: a + b, borders)
-image.dots = {
-    dot: image.dots[dot] for dot in image.dots if image.dots[dot] not in borders
-}
-
-puzzle_actual_result = sum([1 for dot in image.dots if image.dots[dot].terrain == "#"])
+puzzle_actual_result = image.dots_to_text().count("#")
 
 
 # -------------------------------- Outputs / results --------------------------------- #
