@@ -386,10 +386,7 @@ class WeightedGraph(Graph):
                     continue
 
                 # Adding for future examination
-                if type(neighbor) == complex:
-                    heapq.heappush(frontier, (current_distance + weight, neighbor))
-                else:
-                    heapq.heappush(frontier, (current_distance + weight, neighbor))
+                heapq.heappush(frontier, (current_distance + weight, neighbor))
 
                 # Adding for final search
                 self.distance_from_start[neighbor] = current_distance + weight
