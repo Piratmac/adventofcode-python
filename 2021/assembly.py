@@ -78,7 +78,7 @@ class Program:
         ):
             self.instructions_done += 1
             # Get details of current operation
-            opcode = self.instructions[self.pointer]
+            opcode = self.instructions[self.pointer][0]
             current_instr = self.get_instruction(opcode)
 
             # Outputs operation details before its execution
@@ -103,9 +103,9 @@ class Program:
         values = [opcode] + [
             self.instructions[self.pointer + order + 1] for order in args_order
         ]
-        print([self.pointer + order + 1 for order in args_order])
+        # print([self.pointer + order + 1 for order in args_order])
 
-        print(args_order, values, self.operation_codes[opcode])
+        # print(args_order, values, self.operation_codes[opcode])
 
         return values
 
@@ -214,6 +214,12 @@ class Program:
     def op_multiply(self, instr):
         self.set_register(
             instr[1], self.get_register(instr[2]) * self.get_register(instr[3])
+        )
+
+    # div a b c: store into <a> the division of <b> by <c>" (integer value),
+    def op_divide(self, instr):
+        self.set_register(
+            instr[1], self.get_register(instr[2]) // self.get_register(instr[3])
         )
 
     # mod a b c: store into <a> the remainder of <b> divided by <c>",
@@ -483,6 +489,7 @@ class Program:
         9: ["add: {0} = {1}+{2}", 4, op_add, [2, 0, 1]],  # This means c = a + b
         10: ["mult: {0} = {1}*{2}", 4, op_multiply, [0, 1, 2]],
         11: ["mod: {0} = {1}%{2}", 4, op_modulo, [0, 1, 2]],
+        17: ["div: {0} = {1}//{2}", 4, op_divide, [0, 1, 2]],
         1: ["set: {0} = {1}", 3, op_set, [0, 1]],
         # Comparisons
         4: ["eq: {0} = {1} == {2}", 4, op_equal, [0, 1, 2]],
